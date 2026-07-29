@@ -1,3 +1,4 @@
+/* eslint-disable discourse/discourse-common-imports, ember/avoid-leaking-state-in-ember-objects, ember/no-actions-hash, ember/no-classic-classes */
 import Controller from "@ember/controller";
 import { notEmpty } from "@ember/object/computed";
 import discourseComputed from "discourse-common/utils/decorators";

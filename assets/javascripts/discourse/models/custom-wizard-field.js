@@ -1,3 +1,4 @@
+/* eslint-disable discourse/discourse-common-imports, ember/no-classic-classes, ember/no-mixins */
 import EmberObject from "@ember/object";
 import discourseComputed from "discourse-common/utils/decorators";
 import { translationOrText } from "discourse/plugins/discourse-custom-wizard/discourse/lib/wizard";

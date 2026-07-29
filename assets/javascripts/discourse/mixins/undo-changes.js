@@ -1,3 +1,4 @@
+/* eslint-disable discourse/discourse-common-imports, ember/no-new-mixins, ember/no-observers */
 import { get, set } from "@ember/object";
 import Mixin from "@ember/object/mixin";
 import { deepEqual } from "discourse-common/lib/object";

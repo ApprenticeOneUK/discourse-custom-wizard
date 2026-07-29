@@ -1,3 +1,4 @@
+/* eslint-disable discourse/discourse-common-imports, discourse/i18n-t, ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
 import { action } from "@ember/object";
 import { getOwner } from "@ember/owner";

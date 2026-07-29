@@ -1,3 +1,4 @@
+/* eslint-disable discourse/discourse-common-imports, discourse/i18n-import-location, ember/no-classic-classes, ember/no-classic-components, ember/no-mixins, ember/require-tagless-components, simple-import-sort/imports */
 import Component from "@ember/component";
 import { computed } from "@ember/object";
 import { empty, equal, or } from "@ember/object/computed";

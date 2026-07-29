@@ -1,3 +1,4 @@
+/* eslint-disable discourse/discourse-common-imports, discourse/ui-kit-imports */
 import DateTimeInput from "discourse/components/date-time-input";
 import discourseComputed from "discourse-common/utils/decorators";
 

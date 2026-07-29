@@ -1,3 +1,4 @@
+/* eslint-disable discourse/deprecated-imports */
 import { htmlSafe } from "@ember/template";
 import { i18n } from "discourse-i18n";
 

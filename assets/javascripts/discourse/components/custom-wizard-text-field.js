@@ -1,3 +1,4 @@
+/* eslint-disable discourse/discourse-common-imports, discourse/i18n-import-location, discourse/ui-kit-imports, simple-import-sort/imports */
 import TextField from "discourse/components/text-field";
 import { isLTR, isRTL, siteDir } from "discourse/lib/text-direction";
 import computed from "discourse-common/utils/decorators";

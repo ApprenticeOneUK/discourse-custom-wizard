@@ -1,3 +1,4 @@
+/* eslint-disable discourse/deprecated-imports, discourse/i18n-import-location */
 import { A } from "@ember/array";
 import EmberObject from "@ember/object";
 import I18n from "I18n";

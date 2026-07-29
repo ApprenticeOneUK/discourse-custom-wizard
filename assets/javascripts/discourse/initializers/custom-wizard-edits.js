@@ -1,3 +1,4 @@
+/* eslint-disable discourse/discourse-common-imports, discourse/plugin-api-no-version */
 import { action } from "@ember/object";
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";

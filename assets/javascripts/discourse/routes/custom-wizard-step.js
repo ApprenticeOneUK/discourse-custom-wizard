@@ -1,3 +1,4 @@
+/* eslint-disable discourse/i18n-import-location, ember/no-classic-classes, simple-import-sort/imports */
 import { action } from "@ember/object";
 import Route from "@ember/routing/route";
 import { service } from "@ember/service";

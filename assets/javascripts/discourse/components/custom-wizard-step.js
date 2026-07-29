@@ -1,3 +1,4 @@
+/* eslint-disable discourse/deprecated-imports, discourse/discourse-common-imports, ember/no-actions-hash, ember/no-classic-classes, ember/no-classic-components, ember/no-jquery, ember/require-tagless-components */
 import Component from "@ember/component";
 import { alias, not, or } from "@ember/object/computed";
 import { schedule } from "@ember/runloop";

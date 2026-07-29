@@ -1,3 +1,4 @@
+/* eslint-disable no-unassigned-vars */
 import { optionalRequire } from "discourse/lib/utilities";
 
 const ValueList = optionalRequire("admin/components/value-list");

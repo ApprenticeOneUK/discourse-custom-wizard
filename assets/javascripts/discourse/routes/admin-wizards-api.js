@@ -1,3 +1,4 @@
+/* eslint-disable ember/no-actions-hash */
 import { service } from "@ember/service";
 import DiscourseRoute from "discourse/routes/discourse";
 import CustomWizardApi from "../models/custom-wizard-api";

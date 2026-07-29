@@ -1,3 +1,4 @@
+/* eslint-disable discourse/deprecated-imports, discourse/discourse-common-imports, ember/no-classic-classes */
 import { A } from "@ember/array";
 import EmberObject from "@ember/object";
 import { dasherize } from "@ember/string";

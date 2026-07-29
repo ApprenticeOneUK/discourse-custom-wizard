@@ -1,3 +1,5 @@
+@use "sass:color";
+
 body.custom-wizard {
   .event-form {
     width: 585px;
@@ -89,7 +91,6 @@ body.custom-wizard {
           .pika-lendar,
           .is-selected .pika-button {
             color: var(--primary-low);
-            background-image: initial;
             background: initial;
             box-shadow: initial;
             cursor: default;
@@ -205,7 +206,7 @@ body.custom-wizard {
   $pd-picker-bg: var(--secondary) !default;
   $pd-picker-border: var(--primary-low) !default;
   $pd-picker-border-bottom: var(--primary-low) !default;
-  $pd-picker-shadow: rgba(0, 0, 0, 0.5) !default;
+  $pd-picker-shadow: rgb(0, 0, 0, 0.5) !default;
   $pd-th-color: var(--primary) !default;
   $pd-day-color: var(--primary) !default;
   $pd-day-bg: var(--secondary) !default;
@@ -244,13 +245,13 @@ body.custom-wizard {
   // clear child float (pika-lendar), using the famous micro clearfix hack
   // http://nicolasgallagher.com/micro-clearfix-hack/
   .pika-single {
-    &:before,
-    &:after {
+    &::before,
+    &::after {
       content: " ";
       display: table;
     }
 
-    &:after {
+    &::after {
       clear: both;
     }
   }
@@ -309,7 +310,8 @@ body.custom-wizard {
     background-repeat: no-repeat;
     background-size: 75% 75%;
     opacity: 0.5;
-    @if (lightness($secondary) < 50) {
+
+    @if color.lightness($secondary) < 50 {
       // invert the black png if the background is dark
       filter: invert(1);
     }
@@ -369,7 +371,6 @@ body.custom-wizard {
   .pika-button {
     cursor: pointer;
     display: block;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
     outline: none;
     border: 0;
@@ -435,16 +436,13 @@ body.custom-wizard {
   }
 
   // timepicker
-
   .ui-timepicker-wrapper {
     overflow-y: auto;
     max-height: 150px;
     width: 6.5em;
     background: #fff;
     border: 1px solid #ddd;
-    -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-    -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 10px rgb(0, 0, 0, 0.2);
     outline: none;
     z-index: 10001;
     margin: 0;

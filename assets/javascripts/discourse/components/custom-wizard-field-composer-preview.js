@@ -1,3 +1,4 @@
+/* eslint-disable discourse/discourse-common-imports, ember/no-classic-classes, ember/no-classic-components, ember/no-jquery, ember/require-tagless-components */
 import Component from "@ember/component";
 import { schedule } from "@ember/runloop";
 import $ from "jquery";

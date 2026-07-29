@@ -31,6 +31,7 @@ body.custom-wizard {
         color: var(--primary-high);
         overflow: hidden;
         text-overflow: ellipsis;
+
         .extra-info-wrapper & {
           color: var(--header_primary);
         }
@@ -48,6 +49,7 @@ body.custom-wizard {
       .badge-category-parent-bg {
         width: 5px;
         margin-right: 0;
+
         + .badge-category-bg {
           width: 5px;
         }
@@ -118,7 +120,7 @@ body.custom-wizard {
         display: inline-block;
         padding: 0 1px;
 
-        &:before {
+        &::before {
           content: "\a0";
         }
       }

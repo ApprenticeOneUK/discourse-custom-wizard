@@ -1,3 +1,4 @@
+/* eslint-disable ember/no-jquery, qunit/no-assert-equal, qunit/no-loose-assertions, qunit/no-negated-ok, qunit/no-ok-equality */
 import { click, currentURL, fillIn, visit } from "@ember/test-helpers";
 import $ from "jquery";
 import { test } from "qunit";

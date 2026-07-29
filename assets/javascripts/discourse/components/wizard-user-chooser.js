@@ -1,3 +1,4 @@
+/* eslint-disable discourse/i18n-import-location, discourse/moved-packages-import-paths, ember/avoid-leaking-state-in-ember-objects */
 import I18n from "I18n";
 import UserChooserComponent from "select-kit/components/user-chooser";
 

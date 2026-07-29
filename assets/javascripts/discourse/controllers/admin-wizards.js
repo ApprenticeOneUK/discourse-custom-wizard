@@ -1,3 +1,4 @@
+/* eslint-disable ember/no-classic-classes */
 import Controller from "@ember/controller";
 import { or } from "@ember/object/computed";
 import { service } from "@ember/service";

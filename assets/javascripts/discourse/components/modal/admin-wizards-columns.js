@@ -1,3 +1,4 @@
+/* eslint-disable discourse/i18n-import-location */
 import Component from "@glimmer/component";
 import { action } from "@ember/object";
 import I18n from "I18n";

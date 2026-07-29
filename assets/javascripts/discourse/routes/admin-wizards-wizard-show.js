@@ -1,3 +1,4 @@
+/* eslint-disable discourse/i18n-import-location, simple-import-sort/imports */
 import { service } from "@ember/service";
 import { ajax } from "discourse/lib/ajax";
 import DiscourseRoute from "discourse/routes/discourse";

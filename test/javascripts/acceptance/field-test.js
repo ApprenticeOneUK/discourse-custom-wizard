@@ -1,3 +1,4 @@
+/* eslint-disable qunit/no-loose-assertions, qunit/no-negated-ok */
 import { click, fillIn, triggerKeyEvent, visit } from "@ember/test-helpers";
 import { test } from "qunit";
 import {

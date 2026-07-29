@@ -1,3 +1,4 @@
+/* eslint-disable discourse/discourse-common-imports, discourse/i18n-import-location, ember/no-actions-hash, ember/no-classic-classes, simple-import-sort/imports */
 import Controller from "@ember/controller";
 import { and, equal, not } from "@ember/object/computed";
 import { service } from "@ember/service";

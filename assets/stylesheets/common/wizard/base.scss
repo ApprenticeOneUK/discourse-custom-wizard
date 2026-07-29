@@ -29,7 +29,7 @@ body.custom-wizard {
   select,
   textarea {
     color: var(--primary);
-    caret-color: currentColor;
+    caret-color: currentcolor;
 
     &[class*="span"] {
       float: none;

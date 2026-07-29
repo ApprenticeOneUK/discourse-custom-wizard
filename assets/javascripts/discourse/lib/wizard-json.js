@@ -1,3 +1,4 @@
+/* eslint-disable discourse/deprecated-imports */
 import { A } from "@ember/array";
 import EmberObject from "@ember/object";
 import { camelCase, listProperties } from "../lib/wizard";

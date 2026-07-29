@@ -1,3 +1,4 @@
+/* eslint-disable discourse/deprecated-imports, discourse/discourse-common-imports, discourse/ui-kit-imports, ember/no-actions-hash */
 import { A } from "@ember/array";
 import EmberObject, { computed } from "@ember/object";
 import { and, equal, notEmpty } from "@ember/object/computed";

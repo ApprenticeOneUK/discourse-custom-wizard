@@ -1,3 +1,4 @@
+/* eslint-disable discourse/plugin-api-no-version */
 import { dasherize } from "@ember/string";
 import { withPluginApi } from "discourse/lib/plugin-api";
 import DiscourseURL from "discourse/lib/url";

@@ -1,3 +1,4 @@
+/* eslint-disable discourse/discourse-common-imports, ember/no-classic-classes, ember/no-mixins */
 import EmberObject from "@ember/object";
 import { later } from "@ember/runloop";
 import { ajax } from "discourse/lib/ajax";

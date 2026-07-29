@@ -1,3 +1,4 @@
+/* eslint-disable discourse/discourse-common-imports, discourse/moved-packages-import-paths, simple-import-sort/imports */
 import { default as discourseComputed } from "discourse-common/utils/decorators";
 import SelectKitRowComponent from "select-kit/components/select-kit/select-kit-row";
 

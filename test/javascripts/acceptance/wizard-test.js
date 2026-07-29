@@ -1,3 +1,4 @@
+/* eslint-disable discourse/i18n-import-location, ember/no-jquery, qunit/no-loose-assertions, qunit/no-negated-ok, simple-import-sort/imports */
 import { click, visit } from "@ember/test-helpers";
 import $ from "jquery";
 import { test } from "qunit";

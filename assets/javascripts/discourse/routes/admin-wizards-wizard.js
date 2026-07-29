@@ -1,3 +1,4 @@
+/* eslint-disable discourse/deprecated-imports, ember/no-actions-hash */
 import { A } from "@ember/array";
 import EmberObject, { set } from "@ember/object";
 import { service } from "@ember/service";

@@ -1,3 +1,4 @@
+/* eslint-disable discourse/discourse-common-imports, ember/no-actions-hash, ember/no-classic-classes */
 import Controller from "@ember/controller";
 import { empty } from "@ember/object/computed";
 import { service } from "@ember/service";

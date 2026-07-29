@@ -1,3 +1,4 @@
+/* eslint-disable discourse/discourse-common-imports, discourse/lines-between-class-members, discourse/no-computed-macros */
 import { action } from "@ember/object";
 import { alias } from "@ember/object/computed";
 import { service } from "@ember/service";

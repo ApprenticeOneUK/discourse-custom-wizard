@@ -1,3 +1,4 @@
+/* eslint-disable discourse/i18n-import-location, ember/no-actions-hash, ember/no-classic-classes, ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
 import { computed } from "@ember/object";
 import { gt } from "@ember/object/computed";

@@ -1,3 +1,4 @@
+/* eslint-disable ember/avoid-leaking-state-in-ember-objects, ember/no-actions-hash, ember/no-classic-classes */
 import Controller from "@ember/controller";
 import CustomWizardCustomField from "../models/custom-wizard-custom-field";
 

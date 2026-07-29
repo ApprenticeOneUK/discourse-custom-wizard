@@ -1,3 +1,4 @@
+/* eslint-disable discourse/i18n-import-location */
 import EmberObject from "@ember/object";
 import I18n from "I18n";
 import wizardSchema from "./wizard-schema";

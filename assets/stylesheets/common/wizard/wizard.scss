@@ -17,9 +17,8 @@ body.custom-wizard {
     position: relative;
     z-index: 11;
     background-color: var(--secondary);
-    box-shadow: 0 5px 10px rgba(var(--primary-rgb), 0.15);
+    box-shadow: 0 5px 10px rgb(var(--primary-rgb), 0.15);
     box-sizing: border-box;
-    margin: 1.5em auto;
     padding: 0;
     max-width: 820px;
     min-width: 280px;

@@ -1,3 +1,4 @@
+/* eslint-disable discourse/discourse-common-imports, discourse/i18n-import-location, ember/no-actions-hash, ember/no-classic-classes, ember/no-jquery, simple-import-sort/imports */
 import Controller from "@ember/controller";
 import { action } from "@ember/object";
 import { notEmpty } from "@ember/object/computed";

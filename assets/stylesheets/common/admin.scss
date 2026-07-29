@@ -127,7 +127,7 @@ $error: #ef1700;
   .wizard-table-long-text {
     &-content {
       white-space: nowrap;
-      word-wrap: break-word;
+      overflow-wrap: break-word;
       overflow: hidden;
       text-overflow: ellipsis;
       width: 250px;
@@ -638,8 +638,8 @@ $error: #ef1700;
     display: inline-block;
   }
 
-  > span:before,
-  > span:after {
+  > span::before,
+  > span::after {
     content: "";
     position: absolute;
     top: 50%;
@@ -648,12 +648,12 @@ $error: #ef1700;
     background: var(--tertiary);
   }
 
-  > span:before {
+  > span::before {
     right: 100%;
     margin-right: 15px;
   }
 
-  > span:after {
+  > span::after {
     left: 100%;
     margin-left: 15px;
   }
@@ -875,6 +875,7 @@ $error: #ef1700;
       display: flex;
       align-items: center;
     }
+
     &.disabled {
       background: var(--primary-low);
       cursor: unset;
@@ -899,6 +900,7 @@ $error: #ef1700;
 
     .wizard-subscription-badge {
       margin-right: 5px;
+
       svg {
         margin-right: 0.45em;
       }

@@ -1,3 +1,4 @@
+/* eslint-disable discourse/deprecated-imports, discourse/discourse-common-imports, ember/no-actions-hash, ember/no-classic-classes, ember/no-classic-components, ember/require-tagless-components */
 import { getOwner } from "@ember/application";
 import Component from "@ember/component";
 import { dasherize } from "@ember/string";

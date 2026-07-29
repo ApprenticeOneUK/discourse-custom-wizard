@@ -1,3 +1,4 @@
+/* eslint-disable discourse/discourse-common-imports, ember/no-classic-classes */
 import EmberObject from "@ember/object";
 import { Promise } from "rsvp";
 import { ajax } from "discourse/lib/ajax";

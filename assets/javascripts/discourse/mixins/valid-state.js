@@ -1,3 +1,4 @@
+/* eslint-disable discourse/discourse-common-imports */
 import discourseComputed from "discourse-common/utils/decorators";
 
 export const States = {

@@ -1,3 +1,4 @@
+/* eslint-disable discourse/discourse-common-imports, ember/no-classic-classes, ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
 import { dasherize } from "@ember/string";
 import { cook } from "discourse/lib/text";

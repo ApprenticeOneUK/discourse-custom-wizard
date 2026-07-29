@@ -1,3 +1,4 @@
+/* eslint-disable discourse/deprecated-imports, discourse/discourse-common-imports, ember/no-new-mixins */
 import { getOwner } from "@ember/application";
 import { readOnly } from "@ember/object/computed";
 import Mixin from "@ember/object/mixin";

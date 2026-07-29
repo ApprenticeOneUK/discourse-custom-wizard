@@ -1,3 +1,4 @@
+/* eslint-disable discourse/discourse-common-imports, ember/no-actions-hash, ember/no-classic-classes */
 import Controller from "@ember/controller";
 import { service } from "@ember/service";
 import getUrl from "discourse-common/lib/get-url";

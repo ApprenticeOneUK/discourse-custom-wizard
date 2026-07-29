@@ -1,3 +1,4 @@
+/* eslint-disable discourse/discourse-common-imports, ember/no-classic-classes */
 import Controller from "@ember/controller";
 import { or } from "@ember/object/computed";
 import discourseComputed from "discourse-common/utils/decorators";

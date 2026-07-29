@@ -1,3 +1,4 @@
+/* eslint-disable discourse/discourse-common-imports, discourse/moved-packages-import-paths, ember/avoid-leaking-state-in-ember-objects, ember/no-actions-hash, simple-import-sort/imports */
 import { isEmpty } from "@ember/utils";
 import { searchForTerm } from "discourse/lib/search";
 import { makeArray } from "discourse-common/lib/helpers";
