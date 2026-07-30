@@ -5,6 +5,8 @@ import { selectKitOptions } from "discourse/select-kit/components/select-kit";
 import SingleSelectComponent from "discourse/select-kit/components/single-select";
 import { i18n } from "discourse-i18n";
 import { filterValues } from "discourse/plugins/discourse-custom-wizard/discourse/lib/wizard-schema";
+import WizardSubscriptionSelectorHeader from "./wizard-subscription-selector/wizard-subscription-selector-header";
+import WizardSubscriptionSelectorRow from "./wizard-subscription-selector/wizard-subscription-selector-row";
 
 const nameKey = function (feature, attribute, value) {
   if (feature === "action") {
@@ -19,8 +21,7 @@ const nameKey = function (feature, attribute, value) {
   autoFilterable: false,
   filterable: false,
   showFullTitle: true,
-  headerComponent:
-    "wizard-subscription-selector/wizard-subscription-selector-header",
+  headerComponent: WizardSubscriptionSelectorHeader,
   caretUpIcon: "caret-up",
   caretDownIcon: "caret-down",
 })
@@ -90,6 +91,6 @@ export default class WizardSubscriptionSelector extends SingleSelectComponent {
   }
 
   modifyComponentForRow() {
-    return "wizard-subscription-selector/wizard-subscription-selector-row";
+    return WizardSubscriptionSelectorRow;
   }
 }

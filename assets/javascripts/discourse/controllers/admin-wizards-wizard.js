@@ -1,27 +1,25 @@
-/* eslint-disable ember/no-classic-classes */
 import Controller from "@ember/controller";
-import { equal } from "@ember/object/computed";
-import { default as discourseComputed } from "discourse/lib/decorators";
+import { computed } from "@ember/object";
 
-export default Controller.extend({
-  creating: equal("wizardId", "create"),
+export default class AdminWizardsWizardController extends Controller {
+  messageUrl =
+    "https://pavilion.tech/products/discourse-custom-wizard-plugin/documentation/";
 
-  @discourseComputed("creating", "wizardId")
-  wizardListVal(creating, wizardId) {
-    return creating ? null : wizardId;
-  },
+  @computed("wizardId")
+  get creating() {
+    return this.wizardId === "create";
+  }
 
-  @discourseComputed("creating", "wizardId")
-  messageKey(creating, wizardId) {
-    let key = "select";
-    if (creating) {
-      key = "create";
-    } else if (wizardId) {
-      key = "edit";
+  @computed("creating", "wizardId")
+  get wizardListVal() {
+    return this.creating ? null : this.wizardId;
+  }
+
+  @computed("creating", "wizardId")
+  get messageKey() {
+    if (this.creating) {
+      return "create";
     }
-    return key;
-  },
-
-  messageUrl:
-    "https://pavilion.tech/products/discourse-custom-wizard-plugin/documentation/",
-});
+    return this.wizardId ? "edit" : "select";
+  }
+}

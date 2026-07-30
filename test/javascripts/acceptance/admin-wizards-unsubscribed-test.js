@@ -1,10 +1,6 @@
-import { click, currentURL, fillIn, visit } from "@ember/test-helpers";
+import { click, currentURL, fillIn, findAll, visit } from "@ember/test-helpers";
 import { test } from "qunit";
-import {
-  acceptance,
-  query,
-  queryAll,
-} from "discourse/tests/helpers/qunit-helpers";
+import { acceptance, query } from "discourse/tests/helpers/qunit-helpers";
 import selectKit from "discourse/tests/helpers/select-kit-helper";
 import {
   getAdminTestingWizard,
@@ -15,6 +11,12 @@ import {
   getUnsubscribedAdminWizards,
   getWizard,
 } from "../helpers/admin-wizard";
+
+function findAllByText(selector, text) {
+  return findAll(selector).filter((element) =>
+    element.textContent.includes(text)
+  );
+}
 
 acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
   needs.user();
@@ -70,7 +72,7 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
 
   test("Displaying all tabs except API", async (assert) => {
     await visit("/admin/wizards");
-    const list = queryAll(".admin-controls li");
+    const list = findAll(".admin-controls li");
     const count = list.length;
     assert.strictEqual(count, 5, "There should be 5 admin tabs");
   });
@@ -93,7 +95,7 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
       wizardTitle,
       "The title input is inserted"
     );
-    const wizardLink = queryAll("div.wizard-url a");
+    const wizardLink = findAll("div.wizard-url a");
     assert.strictEqual(wizardLink.length, 1, "Wizard link was created");
     await click(".btn-after-time");
     assert
@@ -107,7 +109,7 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
 
     await click(".step .link-list button");
     const stepOneText = "step_1 (step_1)";
-    const stepOneBtn = queryAll(`.step button:contains(${stepOneText})`);
+    const stepOneBtn = findAllByText(".step button", stepOneText);
     assert.strictEqual(stepOneBtn.length, 1, "Creating a step");
     const stepTitle = "step title";
     await fillIn(".wizard-custom-step input[name='title']", stepTitle);
@@ -183,7 +185,7 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
       ".wizard-custom-step .wizard-text-editor textarea",
       `\n\n* List item\n* List item`
     );
-    let listItems = queryAll(
+    let listItems = findAll(
       ".wizard-custom-step .wizard-text-editor .d-editor-preview-wrapper ul li"
     );
     assert.strictEqual(
@@ -205,7 +207,7 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
       ".wizard-custom-step .wizard-text-editor textarea",
       `\n\n1. List item\n1. List item`
     );
-    let orderedListItems = queryAll(
+    let orderedListItems = findAll(
       ".wizard-custom-step .wizard-text-editor .d-editor-preview-wrapper ol li"
     );
     assert.strictEqual(
@@ -251,7 +253,7 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
       .dom(".wizard-custom-field button.undo-changes")
       .isNotVisible("clear button is not rendered");
     const fieldOneText = "step_1_field_1 (step_1_field_1)";
-    const fieldOneBtn = queryAll(`.field button:contains(${fieldOneText})`);
+    const fieldOneBtn = findAllByText(".field button", fieldOneText);
     assert.strictEqual(fieldOneBtn.length, 1, "Creating a field");
     const fieldTitle = "field title";
     await fillIn(".wizard-custom-field input[name='label']", fieldTitle);
@@ -297,7 +299,7 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
     );
     await click(".action .link-list button");
     const actionOneText = "action_1 (action_1)";
-    const actionOneBtn = queryAll(`.action button:contains(${actionOneText})`);
+    const actionOneBtn = findAllByText(".action button", actionOneText);
     assert.strictEqual(actionOneBtn.length, 1, "Creating an action");
     assert.true(
       Boolean(
@@ -311,10 +313,10 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
       ".wizard-custom-action .setting-value .select-kit"
     );
     await actionTypeDropdown.expand();
-    const listEnabled = queryAll(
+    const listEnabled = findAll(
       ".wizard-custom-action .setting .setting-value ul li:not(.disabled)"
     );
-    const listDisabled = queryAll(
+    const listDisabled = findAll(
       ".wizard-custom-action .setting .setting-value ul li.disabled"
     );
     assert.strictEqual(
@@ -336,7 +338,7 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
       ),
       "Create type action correctly selected"
     );
-    let listTopicSettings = queryAll(
+    let listTopicSettings = findAll(
       ".admin-wizard-container .wizard-custom-action .setting"
     );
     assert.strictEqual(
@@ -346,7 +348,7 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
     );
     await actionTypeDropdown.expand();
     await actionTypeDropdown.selectRowByValue("open_composer");
-    listTopicSettings = queryAll(
+    listTopicSettings = findAll(
       ".admin-wizard-container .wizard-custom-action .setting"
     );
     assert.strictEqual(
@@ -356,7 +358,7 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
     );
     await actionTypeDropdown.expand();
     await actionTypeDropdown.selectRowByValue("update_profile");
-    listTopicSettings = queryAll(
+    listTopicSettings = findAll(
       ".admin-wizard-container .wizard-custom-action .setting"
     );
     assert.strictEqual(
@@ -366,7 +368,7 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
     );
     await actionTypeDropdown.expand();
     await actionTypeDropdown.selectRowByValue("route_to");
-    listTopicSettings = queryAll(
+    listTopicSettings = findAll(
       ".admin-wizard-container .wizard-custom-action .setting"
     );
     assert.strictEqual(
@@ -376,7 +378,7 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
     );
     await actionTypeDropdown.expand();
     await click('[data-name="Select a type"]');
-    listTopicSettings = queryAll(
+    listTopicSettings = findAll(
       ".admin-wizard-container .wizard-custom-action .setting"
     );
     assert.strictEqual(

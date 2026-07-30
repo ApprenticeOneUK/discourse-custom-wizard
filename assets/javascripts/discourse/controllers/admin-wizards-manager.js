@@ -1,7 +1,6 @@
 import Controller from "@ember/controller";
 import { action, computed } from "@ember/object";
 import { underscore } from "@ember/string";
-import { observes } from "discourse/lib/decorators";
 import { autoTrackedArray } from "discourse/lib/tracked-tools";
 import { i18n } from "discourse-i18n";
 import CustomWizardManager from "../models/custom-wizard-manager";
@@ -88,16 +87,6 @@ export default class AdminWizardsManager extends Controller {
       filename: null,
     });
     document.getElementById("custom-wizard-file-upload").value = "";
-  }
-
-  @observes("importing", "destroying")
-  setLoadingMessages() {
-    if (this.importing) {
-      this.setMessage("loading", "importing");
-    }
-    if (this.destroying) {
-      this.setMessage("loading", "destroying");
-    }
   }
 
   @action
@@ -226,6 +215,7 @@ export default class AdminWizardsManager extends Controller {
       this.setMessage("error", "none_selected");
     } else {
       this.set("destroying", true);
+      this.setMessage("loading", "destroying");
 
       CustomWizardManager.destroy(destroyWizards)
         .then((result) => {

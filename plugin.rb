@@ -96,14 +96,14 @@ after_initialize do
   require_relative "lib/custom_wizard/extensions/custom_field/serializer.rb"
   require_relative "lib/custom_wizard/extensions/custom_field/extension.rb"
 
-  Liquid::Template.error_mode = :strict
+  Liquid::Environment.default.error_mode = :strict
 
   # preloaded category custom fields
   %w[create_topic_wizard].each do |custom_field|
     Site.preloaded_category_custom_fields << custom_field
   end
 
-  Liquid::Template.register_filter(::CustomWizard::LiquidFilter::FirstNonEmpty)
+  Liquid::Environment.default.register_filter(::CustomWizard::LiquidFilter::FirstNonEmpty)
 
   add_to_class(:topic, :wizard_submission_id) { custom_fields["wizard_submission_id"] }
 

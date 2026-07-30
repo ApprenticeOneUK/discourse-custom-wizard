@@ -9,7 +9,7 @@ pre-commit:
       glob: "*.rb"
       run: bundle exec rubocop --parallel --force-exclusion {staged_files}
     prettier:
-      glob: "*.js"
+      glob: "*.{js,gjs}"
       include: "app/assets/javascripts|plugins/.+?/assets/javascripts"
       run: pnpm exec prettier --check {staged_files}
     prettier-scss:
@@ -17,7 +17,7 @@ pre-commit:
       include: "app/assets/stylesheets|plugins/.+?/assets/stylesheets"
       run: pnpm exec prettier --check {staged_files}
     eslint:
-      glob: "*.js"
+      glob: "*.{js,gjs}"
       include: "app/assets/javascripts|plugins/.+?/assets/javascripts"
       run: pnpm exec eslint --quiet {staged_files}
 
@@ -28,7 +28,7 @@ lints:
       glob: "*.rb"
       run: bundle exec rubocop --parallel
     prettier:
-      run: pnpm exec prettier --check "**/*.js"
+      run: pnpm exec prettier --check "**/*.{js,gjs}"
     prettier-scss:
       run: pnpm exec prettier --check "**/*.scss"
     eslint:
