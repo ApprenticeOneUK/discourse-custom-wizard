@@ -1,5 +1,5 @@
-import { A } from "@ember/array";
 import EmberObject from "@ember/object";
+import { trackedArray } from "@ember/reactive/collections";
 import { camelCase, listProperties } from "../lib/wizard";
 import wizardSchema from "../lib/wizard-schema";
 
@@ -55,7 +55,7 @@ function buildMappedProperty(value) {
     inputs.push(EmberObject.create(input));
   });
 
-  return A(inputs);
+  return trackedArray(inputs);
 }
 
 function buildProperty(json, property, type, objectIndex) {
@@ -92,12 +92,12 @@ function buildObject(json, type, objectIndex) {
 }
 
 function buildObjectArray(json, type) {
-  const array = A();
+  const array = trackedArray();
 
   if (present(json)) {
     json.forEach((objJson, objectIndex) => {
       let object = buildObject(objJson, type, objectIndex);
-      array.pushObject(object);
+      array.push(object);
     });
   }
 
@@ -133,8 +133,8 @@ function actionPatch(json) {
 
 function buildProperties(json) {
   let props = {
-    steps: A(),
-    actions: A(),
+    steps: trackedArray(),
+    actions: trackedArray(),
   };
 
   if (present(json)) {
@@ -155,7 +155,7 @@ function buildProperties(json) {
         );
         stepProps.fields = buildObjectArray(stepJson.fields, "field");
 
-        props.steps.pushObject(EmberObject.create(stepProps));
+        props.steps.push(EmberObject.create(stepProps));
       });
     }
 

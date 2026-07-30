@@ -1,13 +1,14 @@
-/* eslint-disable ember/no-classic-classes, ember/no-classic-components, ember/require-tagless-components */
+/* eslint-disable ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
 import { schedule } from "@ember/runloop";
+import { trustHTML } from "@ember/template";
+import { on } from "@ember-decorators/object";
 import { resolveAllShortUrls } from "pretty-text/upload-short-url";
 import { ajax } from "discourse/lib/ajax";
 import discourseDebounce from "discourse/lib/debounce";
-import { on } from "discourse/lib/decorators";
 import { loadOneboxes } from "discourse/lib/load-oneboxes";
 
-export default Component.extend({
+export default class CustomWizardFieldComposerPreview extends Component {
   @on("init")
   updatePreview() {
     if (this.isDestroyed) {
@@ -21,7 +22,7 @@ export default Component.extend({
 
       this.previewUpdated(this.element);
     });
-  },
+  }
 
   previewUpdated(preview) {
     // Paint oneboxes
@@ -40,5 +41,13 @@ export default Component.extend({
 
     // Short upload urls need resolution
     resolveAllShortUrls(ajax, this.siteSettings, preview);
-  },
-});
+  }
+
+  <template>
+    <div class="wizard-composer-preview d-editor-preview-wrapper">
+      <div class="d-editor-preview">
+        {{trustHTML this.field.preview_template}}
+      </div>
+    </div>
+  </template>
+}

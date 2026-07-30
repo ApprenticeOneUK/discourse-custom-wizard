@@ -1,11 +1,14 @@
 import EmberObject, { action, computed } from "@ember/object";
+import didUpdate from "@ember/render-modifiers/modifiers/did-update";
 import { cancel, later } from "@ember/runloop";
 import { dasherize } from "@ember/string";
+import { trustHTML } from "@ember/template";
 import { classNames } from "@ember-decorators/component";
-import { observes } from "discourse/lib/decorators";
 import { deepMerge } from "discourse/lib/object";
 import { categoryBadgeHTML } from "discourse/ui-kit/helpers/d-category-link";
+import { i18n } from "discourse-i18n";
 import WizardFieldValidator from "discourse/plugins/discourse-custom-wizard/discourse/components/validator";
+import CustomWizardSimilarTopics from "./custom-wizard-similar-topics";
 
 @classNames("similar-topics-validator")
 export default class SimilarTopicsValidator extends WizardFieldValidator {
@@ -118,7 +121,7 @@ export default class SimilarTopicsValidator extends WizardFieldValidator {
 
   validate() {}
 
-  @observes("field.value")
+  @action
   customValidate() {
     const field = this.field;
 
@@ -176,4 +179,23 @@ export default class SimilarTopicsValidator extends WizardFieldValidator {
   closeMessage() {
     this.set("showMessage", false);
   }
+
+  <template>
+    <label
+      class={{this.currentStateClass}}
+      {{didUpdate this.customValidate this.field.value}}
+    >
+      {{#if this.currentState}}
+        {{#if this.insufficientCharactersCategories}}
+          {{trustHTML (i18n this.currentStateKey catLinks=this.catLinks)}}
+        {{else}}
+          {{i18n this.currentStateKey}}
+        {{/if}}
+      {{/if}}
+    </label>
+
+    {{#if this.showSimilarTopics}}
+      <CustomWizardSimilarTopics @topics={{this.similarTopics}} />
+    {{/if}}
+  </template>
 }
