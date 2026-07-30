@@ -66,7 +66,7 @@ export default class WizardCustomStep extends Component {
           @onUploadDone={{this.bannerUploadDone}}
           @onUploadDeleted={{this.bannerUploadDeleted}}
           @type="wizard-step-banner"
-          @class="no-repeat contain-image"
+          class="no-repeat contain-image"
           @id={{concat "wizard-step-" this.step.id "-banner-upload"}}
         />
       </div>

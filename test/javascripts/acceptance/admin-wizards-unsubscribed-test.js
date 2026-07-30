@@ -111,6 +111,15 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
     const stepOneText = "step_1 (step_1)";
     const stepOneBtn = findAllByText(".step button", stepOneText);
     assert.strictEqual(stepOneBtn.length, 1, "Creating a step");
+    assert
+      .dom(".wizard-custom-step .file-uploader")
+      .hasClass("no-repeat", "the banner uploader receives its styling class");
+    assert
+      .dom(".wizard-custom-step .file-uploader")
+      .hasClass(
+        "contain-image",
+        "the banner uploader receives its image class"
+      );
     const stepTitle = "step title";
     await fillIn(".wizard-custom-step input[name='title']", stepTitle);
     const stepButtonText = query(

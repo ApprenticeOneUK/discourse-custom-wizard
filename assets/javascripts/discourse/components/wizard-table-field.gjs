@@ -134,7 +134,9 @@ export default class WizardTableField extends Component {
   }
 
   @action
-  expandText() {
+  expandText(event) {
+    event.preventDefault();
+
     const state = this.get("textState");
 
     if (state === "text-collapsed") {

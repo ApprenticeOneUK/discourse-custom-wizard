@@ -2,6 +2,7 @@
 import Component from "@ember/component";
 import { on } from "@ember/modifier";
 import { action, computed } from "@ember/object";
+import didUpdate from "@ember/render-modifiers/modifiers/did-update";
 import { schedule } from "@ember/runloop";
 import { trustHTML } from "@ember/template";
 import { classNameBindings } from "@ember-decorators/component";
@@ -45,14 +46,9 @@ export default class CustomWizardStep extends Component {
         this.set("saving", false);
         this.autoFocus();
       }
-
-      if (this._stepMessage !== this.step.message) {
-        this.onShowMessage(this.step.message);
-      }
     }
 
     this._stepId = this.step.id;
-    this._stepMessage = this.step.message;
     this._receivedAttrs = true;
 
     cook(this.step.translatedTitle).then((cookedTitle) => {
@@ -200,7 +196,8 @@ export default class CustomWizardStep extends Component {
   }
 
   @action
-  quit() {
+  quit(event) {
+    event?.preventDefault();
     this.wizard.skip();
   }
 
@@ -212,6 +209,11 @@ export default class CustomWizardStep extends Component {
   @action
   showMessage(message) {
     this.onShowMessage(message);
+  }
+
+  @action
+  stepMessageChanged() {
+    this.onShowMessage(this.step.message);
   }
 
   @action
@@ -237,7 +239,9 @@ export default class CustomWizardStep extends Component {
   }
 
   @action
-  backStep() {
+  backStep(event) {
+    event?.preventDefault();
+
     if (this.saving) {
       return;
     }
@@ -261,7 +265,10 @@ export default class CustomWizardStep extends Component {
   }
 
   <template>
-    <div class="wizard-step-contents">
+    <div
+      class="wizard-step-contents"
+      {{didUpdate this.stepMessageChanged this.step.message}}
+    >
       {{#if this.step.title}}
         <h1 class="wizard-step-title">{{this.cookedTitle}}</h1>
       {{/if}}

@@ -72,8 +72,8 @@ export default class WizardMapperInput extends Component {
   didReceiveAttrs() {
     super.didReceiveAttrs(...arguments);
 
-    if (this._inputType !== this.input.type) {
-      this._inputType = this.input.type;
+    if (this._input !== this.input) {
+      this._input = this.input;
       this.setupType();
     }
   }
@@ -95,6 +95,12 @@ export default class WizardMapperInput extends Component {
         );
       }
     }
+  }
+
+  @action
+  inputTypeChanged(value) {
+    this.set("input.type", value);
+    this.setupType();
   }
 
   @action
@@ -136,6 +142,7 @@ export default class WizardMapperInput extends Component {
       @inputType={{this.inputType}}
       @connectorType="type"
       @options={{this.options}}
+      @onChange={{this.inputTypeChanged}}
       @onUpdate={{this.onUpdate}}
     />
 

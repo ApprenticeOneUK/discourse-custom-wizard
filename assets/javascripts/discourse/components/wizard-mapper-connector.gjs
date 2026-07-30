@@ -36,6 +36,7 @@ export default class WizardMapperConnector extends Component {
   @action
   changeConnector(value) {
     this.set("connector", value);
+    this.onChange?.(value);
     this.onUpdate("connector", this.connectorType);
   }
 
