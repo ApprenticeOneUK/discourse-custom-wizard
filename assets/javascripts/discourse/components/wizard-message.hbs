@@ -2,13 +2,13 @@
   {{#if this.showIcon}}
     {{d-icon this.icon}}
   {{/if}}
-  <span class="message-content">{{html-safe this.message}}</span>
+  <span class="message-content">{{custom-wizard-trust-html this.message}}</span>
   {{#if this.hasItems}}
     <ul>
       {{#each this.items as |item|}}
         <li>
           <span>{{d-icon item.icon}}</span>
-          <span>{{html-safe item.html}}</span>
+          <span>{{custom-wizard-trust-html item.html}}</span>
         </li>
       {{/each}}
     </ul>

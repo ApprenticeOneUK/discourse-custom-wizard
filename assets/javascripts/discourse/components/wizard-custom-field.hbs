@@ -171,14 +171,14 @@
 {{#if this.isDateTime}}
   <div class="setting">
     <div class="setting-label">
-      <label>{{html-safe
+      <label>{{custom-wizard-trust-html
           (i18n "admin.wizard.field.date_time_format.label")
         }}</label>
     </div>
 
     <div class="setting-value">
       <Input @value={{this.field.format}} class="medium" />
-      <label>{{html-safe
+      <label>{{custom-wizard-trust-html
           (i18n "admin.wizard.field.date_time_format.instructions")
         }}</label>
     </div>

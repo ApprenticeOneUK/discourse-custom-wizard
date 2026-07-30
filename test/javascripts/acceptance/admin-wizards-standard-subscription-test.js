@@ -16,6 +16,8 @@ import {
 } from "../helpers/admin-wizard";
 
 acceptance("Admin | Custom Wizard Standard Subscription", function (needs) {
+  let apiRequestCount = 0;
+
   needs.user();
   needs.settings({
     custom_wizard_enabled: true,
@@ -33,7 +35,8 @@ acceptance("Admin | Custom Wizard Standard Subscription", function (needs) {
       return helper.response(getStandardAdminWizard);
     });
     server.get("/admin/wizards/api", () => {
-      return helper.response({ success: "OK" });
+      apiRequestCount += 1;
+      return helper.response(429, { errors: ["Too many requests"] });
     });
     server.get("/admin/config/user_fields", () => {
       return helper.response({ user_fields: [] });
@@ -60,6 +63,19 @@ acceptance("Admin | Custom Wizard Standard Subscription", function (needs) {
     const list = queryAll(".admin-controls li");
     const count = list.length;
     assert.strictEqual(count, 5, "There should be 5 admin tabs");
+  });
+
+  test("loads the wizard admin without a separate API request", async (assert) => {
+    apiRequestCount = 0;
+
+    await visit("/admin/wizards/wizard");
+
+    assert.strictEqual(
+      apiRequestCount,
+      0,
+      "does not make a separate API list request"
+    );
+    assert.dom(".admin-wizard-controls").exists("renders the wizard controls");
   });
 
   test("creating a new wizard", async (assert) => {

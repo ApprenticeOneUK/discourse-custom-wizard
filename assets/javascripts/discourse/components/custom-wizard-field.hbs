@@ -1,5 +1,5 @@
 <label for={{this.field.id}} class="field-label">
-  {{html-safe this.field.translatedLabel}}
+  {{custom-wizard-trust-html this.field.translatedLabel}}
 </label>
 
 {{#if this.field.image}}
@@ -32,7 +32,7 @@
 {{/if}}
 
 {{#if this.field.errorDescription}}
-  <div class="field-error-description">{{html-safe
+  <div class="field-error-description">{{custom-wizard-trust-html
       this.field.errorDescription
     }}</div>
 {{/if}}

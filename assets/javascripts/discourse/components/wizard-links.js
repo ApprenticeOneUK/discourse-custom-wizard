@@ -1,5 +1,4 @@
 /* eslint-disable ember/no-actions-hash, ember/no-classic-classes, ember/no-classic-components, ember/require-tagless-components */
-// eslint-disable-next-line discourse/deprecated-imports -- preserve observable arrays used by this legacy component
 import { A } from "@ember/array";
 import Component from "@ember/component";
 import EmberObject, { computed } from "@ember/object";

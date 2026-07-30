@@ -1,7 +1,9 @@
 <label class={{this.currentStateClass}}>
   {{#if this.currentState}}
     {{#if this.insufficientCharactersCategories}}
-      {{html-safe (i18n this.currentStateKey catLinks=this.catLinks)}}
+      {{custom-wizard-trust-html
+        (i18n this.currentStateKey catLinks=this.catLinks)
+      }}
     {{else}}
       {{i18n this.currentStateKey}}
     {{/if}}

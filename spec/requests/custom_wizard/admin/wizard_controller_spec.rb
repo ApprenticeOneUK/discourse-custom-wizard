@@ -30,12 +30,23 @@ describe CustomWizard::AdminWizardController do
   end
 
   it "returns a basic list of wizard templates and wizard field types" do
+    CustomWizard::Api.set("example", title: "Example API")
+    CustomWizard::Api::Endpoint.set("example", "name" => "Example endpoint")
+
     get "/admin/wizards/wizard.json"
+
     expect(response.parsed_body["wizard_list"].map { |w| w["id"] }).to match_array(
       %w[super_mega_fun_wizard super_mega_fun_wizard_2 super_mega_fun_wizard_3],
     )
     expect(response.parsed_body["field_types"].keys).to eq(
       CustomWizard::Field.types.keys.map(&:to_s),
+    )
+    expect(response.parsed_body["apis"]).to contain_exactly(
+      hash_including(
+        "name" => "example",
+        "title" => "Example API",
+        "endpoints" => [hash_including("name" => "Example endpoint")],
+      ),
     )
   end
 

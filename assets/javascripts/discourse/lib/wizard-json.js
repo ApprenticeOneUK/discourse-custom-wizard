@@ -1,4 +1,3 @@
-// eslint-disable-next-line discourse/deprecated-imports -- preserve observable arrays used by legacy wizard components
 import { A } from "@ember/array";
 import EmberObject from "@ember/object";
 import { camelCase, listProperties } from "../lib/wizard";

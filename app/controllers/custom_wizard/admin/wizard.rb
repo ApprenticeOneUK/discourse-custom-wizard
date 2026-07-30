@@ -13,6 +13,11 @@ class CustomWizard::AdminWizardController < CustomWizard::AdminController
       field_types: CustomWizard::Field.types,
       realtime_validations: CustomWizard::RealtimeValidation.types,
       custom_fields: custom_field_list,
+      apis:
+        ActiveModel::ArraySerializer.new(
+          CustomWizard::Api.list,
+          each_serializer: CustomWizard::BasicApiSerializer,
+        ),
     )
   end
 

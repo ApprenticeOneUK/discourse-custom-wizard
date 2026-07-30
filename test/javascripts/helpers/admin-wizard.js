@@ -114,6 +114,7 @@ const getWizard = {
       serializers: null,
     },
   ],
+  apis: [],
 };
 const getUnsubscribedAdminWizards = {
   subscribed: false,

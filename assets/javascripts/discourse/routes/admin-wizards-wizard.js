@@ -17,11 +17,7 @@ export default DiscourseRoute.extend({
     buildFieldTypes(model.field_types);
     buildFieldValidations(model.realtime_validations);
 
-    return all([
-      this._getThemes(model),
-      this._getApis(model),
-      this._getUserFields(model),
-    ]);
+    return all([this._getThemes(model), this._getUserFields(model)]);
   },
 
   _getThemes(model) {
@@ -37,12 +33,6 @@ export default DiscourseRoute.extend({
         })
       );
     });
-  },
-
-  _getApis(model) {
-    return ajax("/admin/wizards/api").then((result) =>
-      set(model, "apis", result)
-    );
   },
 
   _getUserFields(model) {

@@ -1,4 +1,6 @@
-<div class="wizard-header medium">{{html-safe (i18n this.header)}}</div>
+<div class="wizard-header medium">{{custom-wizard-trust-html
+    (i18n this.header)
+  }}</div>
 
 <div class="link-list">
   {{#if this.anyLinks}}
