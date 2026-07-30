@@ -1,10 +1,6 @@
-import { click, visit } from "@ember/test-helpers";
+import { click, findAll, visit } from "@ember/test-helpers";
 import { test } from "qunit";
-import {
-  acceptance,
-  query,
-  queryAll,
-} from "discourse/tests/helpers/qunit-helpers";
+import { acceptance, query } from "discourse/tests/helpers/qunit-helpers";
 import selectKit from "discourse/tests/helpers/select-kit-helper";
 import {
   getAnotherWizardSubmission,
@@ -69,7 +65,7 @@ acceptance("Admin | Submissions", function (needs) {
       "it displays submissions for a selected wizard"
     );
     const submissions = getWizardSubmissions.submissions; // Get submissions data from your JSON file
-    const rows = queryAll("table tbody tr");
+    const rows = findAll("table tbody tr");
 
     for (let i = 0; i < submissions.length; i++) {
       const dateCell = rows[i].querySelector("td:nth-child(1)");
@@ -96,7 +92,7 @@ acceptance("Admin | Submissions", function (needs) {
       );
     }
     assert.true(
-      Boolean(queryAll("table tbody tr").length >= 1),
+      Boolean(findAll("table tbody tr").length >= 1),
       "Displays submissions list"
     );
 
@@ -126,7 +122,7 @@ acceptance("Admin | Submissions", function (needs) {
     );
 
     const submissions = getAnotherWizardSubmission.submissions; // Get submissions data from your JSON file
-    const rows = queryAll("table tbody tr");
+    const rows = findAll("table tbody tr");
 
     for (let i = 0; i < submissions.length; i++) {
       const dateCell = rows[i].querySelector("td:nth-child(1)");
@@ -161,7 +157,7 @@ acceptance("Admin | Submissions", function (needs) {
     }
 
     assert.true(
-      Boolean(queryAll("table tbody tr").length >= 1),
+      Boolean(findAll("table tbody tr").length >= 1),
       "Displays submissions list for another wizard"
     );
   });
@@ -174,7 +170,7 @@ acceptance("Admin | Submissions", function (needs) {
     await click(".open-edit-columns-btn");
     assert.dom(".d-modal__body").exists("Modal is displayed");
 
-    const userCheckbox = queryAll(
+    const userCheckbox = findAll(
       ".edit-directory-columns-container .edit-directory-column:nth-child(2) .left-content .column-name input"
     );
     assert.true(Boolean(userCheckbox), "User checkbox is present");
@@ -188,13 +184,13 @@ acceptance("Admin | Submissions", function (needs) {
       "User checkbox is unchecked after clicking"
     );
 
-    await click(".modal-footer .btn-primary");
+    await click(".d-modal__footer .btn-primary");
     assert
       .dom("table thead th")
       .doesNotIncludeText("User", "User column is not displayed");
 
     await click(".open-edit-columns-btn");
-    const submittedAtCheckbox = queryAll(
+    const submittedAtCheckbox = findAll(
       ".edit-directory-columns-container .edit-directory-column:nth-child(1) .left-content .column-name input"
     );
     assert.true(
@@ -207,7 +203,7 @@ acceptance("Admin | Submissions", function (needs) {
     );
     await click(submittedAtCheckbox[0]);
 
-    await click(".modal-footer .btn-primary");
+    await click(".d-modal__footer .btn-primary");
     assert.false(
       Boolean(submittedAtCheckbox[0].checked),
       "Submitted At checkbox is unchecked after clicking"
@@ -220,7 +216,7 @@ acceptance("Admin | Submissions", function (needs) {
       );
 
     await click(".open-edit-columns-btn");
-    await click(".modal-footer .btn-secondary");
+    await click(".d-modal__footer .btn-secondary");
 
     assert
       .dom("table thead th:nth-child(1)")
@@ -235,7 +231,7 @@ acceptance("Admin | Submissions", function (needs) {
     await wizards.expand();
     await wizards.selectRowByValue("this_is_testing_wizard");
 
-    const downloadLinks = queryAll(".download-link");
+    const downloadLinks = findAll(".download-link");
     assert.true(
       Boolean(downloadLinks.length > 1),
       "Download links are present"

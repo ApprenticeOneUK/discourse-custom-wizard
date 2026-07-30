@@ -1,10 +1,6 @@
-import { click, currentURL, fillIn, visit } from "@ember/test-helpers";
+import { click, currentURL, fillIn, findAll, visit } from "@ember/test-helpers";
 import { test } from "qunit";
-import {
-  acceptance,
-  query,
-  queryAll,
-} from "discourse/tests/helpers/qunit-helpers";
+import { acceptance, query } from "discourse/tests/helpers/qunit-helpers";
 import selectKit from "discourse/tests/helpers/select-kit-helper";
 import {
   getBusinessAdminWizard,
@@ -57,7 +53,7 @@ acceptance("Admin | API tab", function (needs) {
 
   test("Visit API tab and fill data", async function (assert) {
     await visit("/admin/wizards/api");
-    const list = queryAll(".admin-controls li");
+    const list = findAll(".admin-controls li");
     const count = list.length;
     assert.strictEqual(count, 6, "There should be 6 admin tabs");
 

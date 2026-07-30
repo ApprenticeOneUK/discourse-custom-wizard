@@ -207,7 +207,7 @@ acceptance("Wizard | Resume on revisit", function (needs) {
 
     await visit("/w/wizard");
 
-    assert.strictEqual(count(".dialog-content:visible"), 1);
+    assert.dom(".dialog-content").isVisible();
     assert.strictEqual(
       query(".dialog-header h3").textContent.trim(),
       i18n("wizard.incomplete_submission.title", {
@@ -224,7 +224,7 @@ acceptance("Wizard | Resume on revisit", function (needs) {
     });
     await visit("/w/wizard");
     await click(".dialog-footer .btn-primary");
-    assert.strictEqual(count(".dialog-content:visible"), 0);
+    assert.dom(".dialog-content").doesNotExist();
   });
 
   test("Restarts when restarted", async function (assert) {

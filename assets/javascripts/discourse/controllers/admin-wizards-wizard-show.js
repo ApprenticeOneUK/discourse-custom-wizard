@@ -1,86 +1,97 @@
-/* eslint-disable ember/no-actions-hash, ember/no-classic-classes */
 import Controller from "@ember/controller";
-import { action } from "@ember/object";
-import { notEmpty } from "@ember/object/computed";
+import { action, computed } from "@ember/object";
 import { later, scheduleOnce } from "@ember/runloop";
 import { service } from "@ember/service";
 import { dasherize } from "@ember/string";
 import copyText from "discourse/lib/copy-text";
-import {
-  default as discourseComputed,
-  observes,
-} from "discourse/lib/decorators";
 import { i18n } from "discourse-i18n";
 import { filterValues } from "discourse/plugins/discourse-custom-wizard/discourse/lib/wizard-schema";
 import NextSessionScheduledModal from "../components/modal/next-session-scheduled";
 import { generateId, wizardFieldList } from "../lib/wizard";
 
-export default Controller.extend({
-  modal: service(),
-  site: service(),
-  hasName: notEmpty("wizard.name"),
+export default class AdminWizardsWizardShowController extends Controller {
+  @service modal;
+  @service site;
 
-  @observes("currentStep")
-  resetCurrentObjects() {
-    const currentStep = this.currentStep;
+  @computed("wizard.name")
+  get hasName() {
+    return Boolean(this.wizard?.name);
+  }
 
-    if (currentStep) {
-      const fields = currentStep.fields;
-      this.set("currentField", fields && fields.length ? fields[0] : null);
-    }
-
+  @action
+  setCurrentStep(currentStep) {
+    const fields = currentStep?.fields;
+    this.setProperties({
+      currentStep,
+      currentField: fields?.length ? fields[0] : null,
+    });
     scheduleOnce("afterRender", this, this._addBodyClass);
-  },
+  }
+
+  @action
+  setCurrentField(currentField) {
+    this.set("currentField", currentField);
+  }
+
+  @action
+  setCurrentAction(currentAction) {
+    this.set("currentAction", currentAction);
+  }
 
   _addBodyClass() {
     document.body.classList.add("admin-wizard");
-  },
+  }
 
-  @observes("wizard.name")
-  setId() {
+  @action
+  updateWizardName(event) {
     const wizard = this.wizard;
+    const name = event.target.value;
+    this.set("wizard.name", name);
+
     if (wizard && !wizard.existingId) {
-      this.set("wizard.id", generateId(wizard.name));
+      this.set("wizard.id", generateId(name));
     }
-  },
+  }
 
-  @discourseComputed("wizard.id")
-  wizardUrl(wizardId) {
-    let baseUrl = window.location.href.split("/admin");
-    return baseUrl[0] + "/w/" + dasherize(wizardId);
-  },
+  @computed("wizard.id")
+  get wizardUrl() {
+    const baseUrl = window.location.href.split("/admin");
+    return `${baseUrl[0]}/w/${dasherize(this.wizard.id)}`;
+  }
 
-  @discourseComputed("wizard.after_time_scheduled")
-  nextSessionScheduledLabel(scheduled) {
-    return scheduled
-      ? moment(scheduled).format("MMMM Do, HH:mm")
+  @computed("wizard.after_time_scheduled")
+  get nextSessionScheduledLabel() {
+    return this.wizard.after_time_scheduled
+      ? moment(this.wizard.after_time_scheduled).format("MMMM Do, HH:mm")
       : i18n("admin.wizard.after_time_time_label");
-  },
+  }
 
-  @discourseComputed(
+  @computed(
     "currentStep.id",
     "wizard.save_submissions",
     "currentStep.fields.@each.label"
   )
-  wizardFields(currentStepId, saveSubmissions) {
+  get wizardFields() {
     let steps = this.wizard.steps;
-    if (!saveSubmissions) {
-      steps = [steps.find((step) => step.id === currentStepId)];
+    if (!this.wizard.save_submissions) {
+      steps = [steps.find((step) => step.id === this.currentStep.id)];
     }
     return wizardFieldList(steps);
-  },
+  }
 
-  @discourseComputed("fieldTypes", "wizard.allowGuests")
-  filteredFieldTypes(fieldTypes) {
-    const fieldTypeIds = fieldTypes.map((f) => f.id);
+  @computed("fieldTypes", "wizard.allowGuests")
+  get filteredFieldTypes() {
+    const fieldTypeIds = this.fieldTypes.map((fieldType) => fieldType.id);
     const allowedTypeIds = filterValues(
       this.wizard,
       "field",
       "type",
       fieldTypeIds
     );
-    return fieldTypes.filter((f) => allowedTypeIds.includes(f.id));
-  },
+    return this.fieldTypes.filter((fieldType) =>
+      allowedTypeIds.includes(fieldType.id)
+    );
+  }
 
   getErrorMessage(result) {
     if (result.backend_validation_error) {
@@ -96,7 +107,7 @@ export default Controller.extend({
     }
 
     return i18n(`admin.wizard.error.${errorType}`, errorParams);
-  },
+  }
 
   setAfterTimeGroupIds() {
     if (!this.wizard.after_time_groups) {
@@ -108,7 +119,7 @@ export default Controller.extend({
     this.setProperties({
       afterTimeGroupIds: groups.map((g) => g.id),
     });
-  },
+  }
 
   @action
   setAfterTimeGroups(groupIds) {
@@ -117,66 +128,66 @@ export default Controller.extend({
       afterTimeGroupIds: groups.map((g) => g.id),
       "wizard.after_time_groups": groups.map((g) => g.name),
     });
-  },
+  }
 
-  actions: {
-    save() {
-      this.setProperties({
-        saving: true,
-        error: null,
-      });
+  @action
+  updateThemeId(themeId) {
+    this.set("wizard.theme_id", themeId);
+  }
 
-      const wizard = this.wizard;
-      const creating = this.creating;
-      let opts = {};
+  @action
+  save() {
+    this.setProperties({
+      saving: true,
+      error: null,
+    });
 
-      if (creating) {
-        opts.create = true;
-      }
+    const wizard = this.wizard;
+    const opts = this.creating ? { create: true } : {};
 
-      wizard
-        .save(opts)
-        .then((result) => {
-          if (result.wizard_id) {
-            this.send("afterSave", result.wizard_id);
-          } else if (result.errors) {
-            this.set("error", result.errors.join(", "));
-          }
-        })
-        .catch((result) => {
-          this.set("error", this.getErrorMessage(result));
+    wizard
+      .save(opts)
+      .then((result) => {
+        if (result.wizard_id) {
+          this.send("afterSave", result.wizard_id);
+        } else if (result.errors) {
+          this.set("error", result.errors.join(", "));
+        }
+      })
+      .catch((result) => {
+        this.set("error", this.getErrorMessage(result));
+        later(() => this.set("error", null), 10000);
+      })
+      .finally(() => this.set("saving", false));
+  }
 
-          later(() => this.set("error", null), 10000);
-        })
-        .finally(() => this.set("saving", false));
-    },
+  @action
+  remove() {
+    this.wizard.remove().then(() => this.send("afterDestroy"));
+  }
 
-    remove() {
-      this.wizard.remove().then(() => this.send("afterDestroy"));
-    },
+  @action
+  setNextSessionScheduled() {
+    this.modal.show(NextSessionScheduledModal, {
+      model: {
+        dateTime: this.wizard.after_time_scheduled,
+        update: (dateTime) => this.set("wizard.after_time_scheduled", dateTime),
+      },
+    });
+  }
 
-    setNextSessionScheduled() {
-      this.modal.show(NextSessionScheduledModal, {
-        model: {
-          dateTime: this.wizard.after_time_scheduled,
-          update: (dateTime) =>
-            this.set("wizard.after_time_scheduled", dateTime),
-        },
-      });
-    },
+  @action
+  copyUrl() {
+    const copyRange = document.createElement("p");
+    copyRange.id = "copy-range";
+    copyRange.textContent = this.wizardUrl;
+    document.body.append(copyRange);
 
-    copyUrl() {
-      const copyRange = document.createElement("p");
-      copyRange.id = "copy-range";
-      copyRange.textContent = this.wizardUrl;
-      document.body.append(copyRange);
+    if (copyText(this.wizardUrl, copyRange)) {
+      this.set("copiedUrl", true);
+      later(() => this.set("copiedUrl", false), 2000);
+    }
 
-      if (copyText(this.wizardUrl, copyRange)) {
-        this.set("copiedUrl", true);
-        later(() => this.set("copiedUrl", false), 2000);
-      }
-
-      copyRange.remove();
-    },
-  },
-});
+    copyRange.remove();
+  }
+}
