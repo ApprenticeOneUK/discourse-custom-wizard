@@ -1,36 +1,29 @@
-/* eslint-disable ember/no-classic-classes */
 import Controller from "@ember/controller";
-import { default as discourseComputed } from "discourse/lib/decorators";
+import { computed } from "@ember/object";
 
-export default Controller.extend({
-  documentationUrl:
-    "https://pavilion.tech/products/discourse-custom-wizard-plugin/documentation/",
+export default class AdminWizardsSubmissionsController extends Controller {
+  documentationUrl =
+    "https://pavilion.tech/products/discourse-custom-wizard-plugin/documentation/";
 
-  @discourseComputed("wizardId")
-  wizardName(wizardId) {
-    let currentWizard = this.wizardList.find(
-      (wizard) => wizard.id === wizardId
+  @computed("wizardId")
+  get wizardName() {
+    const currentWizard = this.wizardList.find(
+      (wizard) => wizard.id === this.wizardId
     );
     if (currentWizard) {
       return currentWizard.name;
     }
-  },
+  }
 
-  @discourseComputed("wizardName")
-  messageOpts(wizardName) {
+  @computed("wizardName")
+  get messageOpts() {
     return {
-      wizardName,
+      wizardName: this.wizardName,
     };
-  },
+  }
 
-  @discourseComputed("wizardId")
-  messageKey(wizardId) {
-    let key = "select";
-
-    if (wizardId) {
-      key = "viewing";
-    }
-
-    return key;
-  },
-});
+  @computed("wizardId")
+  get messageKey() {
+    return this.wizardId ? "viewing" : "select";
+  }
+}

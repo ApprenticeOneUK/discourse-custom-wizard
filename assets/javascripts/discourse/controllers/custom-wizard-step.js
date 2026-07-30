@@ -1,39 +1,42 @@
-/* eslint-disable ember/no-actions-hash, ember/no-classic-classes */
 import Controller from "@ember/controller";
+import { action } from "@ember/object";
 import { service } from "@ember/service";
 import getUrl from "discourse/lib/get-url";
 
-export default Controller.extend({
-  router: service(),
-  wizard: null,
-  step: null,
+export default class CustomWizardStepController extends Controller {
+  @service router;
 
-  actions: {
-    goNext(response) {
-      let nextStepId = response["next_step_id"];
+  wizard = null;
+  step = null;
 
-      if (response.redirect_on_next) {
-        window.location.href = response.redirect_on_next;
-      } else if (response.refresh_required) {
-        const wizardId = this.get("wizard.id");
-        window.location.href = getUrl(`/w/${wizardId}/steps/${nextStepId}`);
-      } else {
-        this.router.transitionTo("customWizardStep", nextStepId);
-      }
-    },
+  @action
+  goNext(response) {
+    const nextStepId = response["next_step_id"];
 
-    goBack() {
-      this.router.transitionTo("customWizardStep", this.get("step.previous"));
-    },
+    if (response.redirect_on_next) {
+      window.location.href = response.redirect_on_next;
+    } else if (response.refresh_required) {
+      const wizardId = this.get("wizard.id");
+      window.location.href = getUrl(`/w/${wizardId}/steps/${nextStepId}`);
+    } else {
+      this.router.transitionTo("customWizardStep", nextStepId);
+    }
+  }
 
-    showMessage(message) {
-      this.set("stepMessage", message);
-    },
+  @action
+  goBack() {
+    this.router.transitionTo("customWizardStep", this.get("step.previous"));
+  }
 
-    resetWizard() {
-      const id = this.get("wizard.id");
-      const stepId = this.get("step.id");
-      window.location.href = getUrl(`/w/${id}/steps/${stepId}?reset=true`);
-    },
-  },
-});
+  @action
+  showMessage(message) {
+    this.set("stepMessage", message);
+  }
+
+  @action
+  resetWizard() {
+    const id = this.get("wizard.id");
+    const stepId = this.get("step.id");
+    window.location.href = getUrl(`/w/${id}/steps/${stepId}?reset=true`);
+  }
+}

@@ -1,19 +1,2 @@
 # Legacy object-literal decorators are not supported by Prettier 3.
-assets/javascripts/discourse/components/custom-wizard-field-composer-preview.js
-assets/javascripts/discourse/components/custom-wizard-field-composer.js
-assets/javascripts/discourse/components/custom-wizard-field-date-time.js
-assets/javascripts/discourse/components/custom-wizard-field-date.js
-assets/javascripts/discourse/components/custom-wizard-field-time.js
-assets/javascripts/discourse/components/custom-wizard-field-user-selector.js
-assets/javascripts/discourse/components/custom-wizard-similar-topics.js
-assets/javascripts/discourse/components/wizard-custom-action.js
-assets/javascripts/discourse/components/wizard-custom-field.js
-assets/javascripts/discourse/components/wizard-mapper-selector.js
-assets/javascripts/discourse/components/wizard-message.js
-assets/javascripts/discourse/controllers/admin-wizards-api-show.js
-assets/javascripts/discourse/controllers/admin-wizards-logs.js
-assets/javascripts/discourse/controllers/admin-wizards-submissions.js
-assets/javascripts/discourse/controllers/admin-wizards-wizard-show.js
-assets/javascripts/discourse/controllers/admin-wizards-wizard.js
-assets/javascripts/discourse/models/custom-wizard-api.js
 assets/javascripts/discourse/routes/custom-wizard-step.js

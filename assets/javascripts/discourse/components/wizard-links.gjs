@@ -99,6 +99,11 @@ export default class WizardLinks extends Component {
     return numbers[numbers.length - 1];
   }
 
+  setCurrent(item) {
+    this.set("current", item);
+    this.onChange?.(item);
+  }
+
   @action
   add() {
     const items = this.items;
@@ -125,7 +130,7 @@ export default class WizardLinks extends Component {
     const newItem = EmberObject.create(params);
     items.push(newItem);
 
-    this.set("current", newItem);
+    this.setCurrent(newItem);
   }
 
   @action
@@ -140,10 +145,7 @@ export default class WizardLinks extends Component {
 
   @action
   change(itemId) {
-    this.set(
-      "current",
-      this.items.find((item) => item.id === itemId)
-    );
+    this.setCurrent(this.items.find((item) => item.id === itemId));
   }
 
   @action
@@ -162,7 +164,7 @@ export default class WizardLinks extends Component {
     items.splice(index, 1);
 
     if (nextIndex) {
-      this.set("current", items[nextIndex]);
+      this.setCurrent(items[nextIndex]);
     }
   }
 

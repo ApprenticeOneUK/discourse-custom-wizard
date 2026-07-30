@@ -41,13 +41,13 @@ export default DiscourseRoute.extend({
       apis: parentModel.apis,
       themes: parentModel.themes,
       wizard,
-      currentStep: wizard.steps[0],
-      currentAction: wizard.actions[0],
       creating: model.create,
       afterTimeGroupIds: [],
     };
 
     controller.setProperties(props);
+    controller.setCurrentStep(wizard.steps[0]);
+    controller.setCurrentAction(wizard.actions[0]);
     controller.setAfterTimeGroupIds();
   },
 });

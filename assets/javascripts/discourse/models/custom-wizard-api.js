@@ -1,21 +1,19 @@
 /* eslint-disable ember/no-classic-classes */
-import EmberObject from "@ember/object";
+import EmberObject, { computed } from "@ember/object";
 import { trackedArray } from "@ember/reactive/collections";
 import { dasherize } from "@ember/string";
 import { ajax } from "discourse/lib/ajax";
-import { default as discourseComputed } from "discourse/lib/decorators";
 
 const CustomWizardApi = EmberObject.extend({
-  @discourseComputed("name")
-  redirectUri(name) {
-    let nameParam = dasherize(name);
+  redirectUri: computed("name", function () {
+    const nameParam = dasherize(this.name);
     const baseUrl =
       location.protocol +
       "//" +
       location.hostname +
       (location.port ? ":" + location.port : "");
     return baseUrl + `/admin/wizards/api/${nameParam}/redirect`;
-  },
+  }),
 });
 
 CustomWizardApi.reopenClass({
