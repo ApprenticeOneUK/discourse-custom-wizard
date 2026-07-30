@@ -1,15 +1,20 @@
 import Controller from "@ember/controller";
-import { notEmpty } from "@ember/object/computed";
-import discourseComputed from "discourse-common/utils/decorators";
+import { action, computed } from "@ember/object";
+import { autoTrackedArray } from "discourse/lib/tracked-tools";
 import CustomWizardLogs from "../models/custom-wizard-logs";
 
-export default Controller.extend({
-  refreshing: false,
-  hasLogs: notEmpty("logs"),
-  page: 0,
-  canLoadMore: true,
-  logs: [],
-  messageKey: "viewing",
+export default class AdminWizardsLogsShow extends Controller {
+  @autoTrackedArray logs = [];
+
+  refreshing = false;
+  page = 0;
+  canLoadMore = true;
+  messageKey = "viewing";
+
+  @computed("logs.[]")
+  get hasLogs() {
+    return Boolean(this.logs.length);
+  }
 
   loadLogs() {
     if (!this.canLoadMore) {
@@ -25,28 +30,28 @@ export default Controller.extend({
         this.set("logs", this.logs.concat(result.logs));
       })
       .finally(() => this.set("refreshing", false));
-  },
+  }
 
-  @discourseComputed("hasLogs", "refreshing")
-  noResults(hasLogs, refreshing) {
-    return !hasLogs && !refreshing;
-  },
+  @computed("hasLogs", "refreshing")
+  get noResults() {
+    return !this.hasLogs && !this.refreshing;
+  }
 
-  actions: {
-    loadMore() {
-      if (!this.loadingMore && this.logs.length < this.total) {
-        this.set("page", (this.page += 1));
-        this.loadLogs();
-      }
-    },
-
-    refresh() {
-      this.setProperties({
-        canLoadMore: true,
-        page: 0,
-        logs: [],
-      });
+  @action
+  loadMore() {
+    if (!this.loadingMore && this.logs.length < this.total) {
+      this.set("page", (this.page += 1));
       this.loadLogs();
-    },
-  },
-});
+    }
+  }
+
+  @action
+  refresh() {
+    this.setProperties({
+      canLoadMore: true,
+      page: 0,
+      logs: [],
+    });
+    this.loadLogs();
+  }
+}

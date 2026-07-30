@@ -1,11 +1,11 @@
+/* eslint-disable ember/no-classic-classes, ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
 import { schedule } from "@ember/runloop";
-import $ from "jquery";
 import { resolveAllShortUrls } from "pretty-text/upload-short-url";
 import { ajax } from "discourse/lib/ajax";
+import discourseDebounce from "discourse/lib/debounce";
+import { on } from "discourse/lib/decorators";
 import { loadOneboxes } from "discourse/lib/load-oneboxes";
-import discourseDebounce from "discourse-common/lib/debounce";
-import { on } from "discourse-common/utils/decorators";
 
 export default Component.extend({
   @on("init")
@@ -19,21 +19,15 @@ export default Component.extend({
         return;
       }
 
-      const $preview = $(this.element);
-
-      if ($preview.length === 0) {
-        return;
-      }
-
-      this.previewUpdated($preview);
+      this.previewUpdated(this.element);
     });
   },
 
-  previewUpdated($preview) {
+  previewUpdated(preview) {
     // Paint oneboxes
     const paintFunc = () => {
       loadOneboxes(
-        $preview[0],
+        preview,
         ajax,
         null,
         null,
@@ -45,6 +39,6 @@ export default Component.extend({
     discourseDebounce(this, paintFunc, 450);
 
     // Short upload urls need resolution
-    resolveAllShortUrls(ajax, this.siteSettings, $preview[0]);
+    resolveAllShortUrls(ajax, this.siteSettings, preview);
   },
 });

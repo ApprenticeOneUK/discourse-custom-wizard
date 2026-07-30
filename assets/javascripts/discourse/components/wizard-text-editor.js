@@ -1,71 +1,82 @@
+/* eslint-disable ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
-import { notEmpty } from "@ember/object/computed";
+import { action, computed } from "@ember/object";
 import { scheduleOnce } from "@ember/runloop";
-import $ from "jquery";
-import discourseComputed from "discourse-common/utils/decorators";
-import I18n from "I18n";
+import { classNames } from "@ember-decorators/component";
+import { i18n } from "discourse-i18n";
 import { userProperties } from "../lib/wizard";
 
 const excludedUserProperties = ["profile_background", "card_background"];
 
-export default Component.extend({
-  classNames: "wizard-text-editor",
-  barEnabled: true,
-  previewEnabled: true,
-  fieldsEnabled: true,
-  hasWizardFields: notEmpty("wizardFieldList"),
-  hasWizardActions: notEmpty("wizardActionList"),
+@classNames("wizard-text-editor")
+export default class WizardTextEditor extends Component {
+  barEnabled = true;
+  previewEnabled = true;
+  fieldsEnabled = true;
+
+  @computed("wizardFieldList.[]")
+  get hasWizardFields() {
+    return Boolean(this.wizardFieldList.length);
+  }
+
+  @computed("wizardActionList.[]")
+  get hasWizardActions() {
+    return Boolean(this.wizardActionList.length);
+  }
 
   didReceiveAttrs() {
-    this._super(...arguments);
+    super.didReceiveAttrs(...arguments);
 
     if (!this.barEnabled) {
       scheduleOnce("afterRender", this, this._hideButtonBar);
     }
-  },
+  }
 
   _hideButtonBar() {
-    $(this.element).find(".d-editor-button-bar").addClass("hidden");
-  },
+    this.element.querySelector(".d-editor-button-bar")?.classList.add("hidden");
+  }
 
-  @discourseComputed("forcePreview")
-  previewLabel(forcePreview) {
-    return I18n.t("admin.wizard.editor.preview", {
-      action: I18n.t(`admin.wizard.editor.${forcePreview ? "hide" : "show"}`),
+  @computed("forcePreview")
+  get previewLabel() {
+    return i18n("admin.wizard.editor.preview", {
+      action: i18n(
+        `admin.wizard.editor.${this.forcePreview ? "hide" : "show"}`
+      ),
     });
-  },
+  }
 
-  @discourseComputed("showPopover")
-  popoverLabel(showPopover) {
-    return I18n.t("admin.wizard.editor.popover", {
-      action: I18n.t(`admin.wizard.editor.${showPopover ? "hide" : "show"}`),
+  @computed("showPopover")
+  get popoverLabel() {
+    return i18n("admin.wizard.editor.popover", {
+      action: i18n(`admin.wizard.editor.${this.showPopover ? "hide" : "show"}`),
     });
-  },
+  }
 
-  @discourseComputed()
-  userPropertyList() {
+  get userPropertyList() {
     return userProperties
       .filter((f) => !excludedUserProperties.includes(f))
       .map((f) => ` u{${f}}`);
-  },
+  }
 
-  @discourseComputed("wizardFields")
-  wizardFieldList(wizardFields) {
-    return (wizardFields || []).map((f) => ` w{${f.id}}`);
-  },
+  @computed("wizardFields")
+  get wizardFieldList() {
+    return (this.wizardFields || []).map((field) => ` w{${field.id}}`);
+  }
 
-  @discourseComputed("wizardActions")
-  wizardActionList(wizardActions) {
-    return (wizardActions || []).map((a) => ` w{${a.id}}`);
-  },
+  @computed("wizardActions")
+  get wizardActionList() {
+    return (this.wizardActions || []).map((actionItem) => {
+      return ` w{${actionItem.id}}`;
+    });
+  }
 
-  actions: {
-    togglePreview() {
-      this.toggleProperty("forcePreview");
-    },
+  @action
+  togglePreview() {
+    this.toggleProperty("forcePreview");
+  }
 
-    togglePopover() {
-      this.toggleProperty("showPopover");
-    },
-  },
-});
+  @action
+  togglePopover() {
+    this.toggleProperty("showPopover");
+  }
+}

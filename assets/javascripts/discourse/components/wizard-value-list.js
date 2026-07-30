@@ -5,7 +5,7 @@ const ValueList = optionalRequire("admin/components/value-list");
 let WizardValueList;
 
 if (ValueList) {
-  ValueList.extend({
+  WizardValueList = class extends ValueList {
     _saveValues() {
       if (this.inputType === "array") {
         this.onChange(this.collection);
@@ -13,8 +13,8 @@ if (ValueList) {
       }
 
       this.onChange(this.collection.join(this.inputDelimiter || "\n"));
-    },
-  });
+    }
+  };
 }
 
 export default WizardValueList;

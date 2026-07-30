@@ -1,16 +1,16 @@
+/* eslint-disable ember/no-actions-hash, ember/no-classic-classes */
 import Controller from "@ember/controller";
 import { action } from "@ember/object";
 import { notEmpty } from "@ember/object/computed";
 import { later, scheduleOnce } from "@ember/runloop";
 import { service } from "@ember/service";
 import { dasherize } from "@ember/string";
-import $ from "jquery";
 import copyText from "discourse/lib/copy-text";
 import {
   default as discourseComputed,
   observes,
-} from "discourse-common/utils/decorators";
-import I18n from "I18n";
+} from "discourse/lib/decorators";
+import { i18n } from "discourse-i18n";
 import { filterValues } from "discourse/plugins/discourse-custom-wizard/discourse/lib/wizard-schema";
 import NextSessionScheduledModal from "../components/modal/next-session-scheduled";
 import { generateId, wizardFieldList } from "../lib/wizard";
@@ -33,7 +33,7 @@ export default Controller.extend({
   },
 
   _addBodyClass() {
-    $("body").addClass("admin-wizard");
+    document.body.classList.add("admin-wizard");
   },
 
   @observes("wizard.name")
@@ -54,7 +54,7 @@ export default Controller.extend({
   nextSessionScheduledLabel(scheduled) {
     return scheduled
       ? moment(scheduled).format("MMMM Do, HH:mm")
-      : I18n.t("admin.wizard.after_time_time_label");
+      : i18n("admin.wizard.after_time_time_label");
   },
 
   @discourseComputed(
@@ -65,7 +65,7 @@ export default Controller.extend({
   wizardFields(currentStepId, saveSubmissions) {
     let steps = this.wizard.steps;
     if (!saveSubmissions) {
-      steps = [steps.findBy("id", currentStepId)];
+      steps = [steps.find((step) => step.id === currentStepId)];
     }
     return wizardFieldList(steps);
   },
@@ -95,7 +95,7 @@ export default Controller.extend({
       errorParams = result.error.params;
     }
 
-    return I18n.t(`admin.wizard.error.${errorType}`, errorParams);
+    return i18n(`admin.wizard.error.${errorType}`, errorParams);
   },
 
   setAfterTimeGroupIds() {
@@ -166,17 +166,17 @@ export default Controller.extend({
     },
 
     copyUrl() {
-      const $copyRange = $('<p id="copy-range"></p>');
-      $copyRange.html(this.wizardUrl);
+      const copyRange = document.createElement("p");
+      copyRange.id = "copy-range";
+      copyRange.textContent = this.wizardUrl;
+      document.body.append(copyRange);
 
-      $(document.body).append($copyRange);
-
-      if (copyText(this.wizardUrl, $copyRange[0])) {
+      if (copyText(this.wizardUrl, copyRange)) {
         this.set("copiedUrl", true);
         later(() => this.set("copiedUrl", false), 2000);
       }
 
-      $copyRange.remove();
+      copyRange.remove();
     },
   },
 });

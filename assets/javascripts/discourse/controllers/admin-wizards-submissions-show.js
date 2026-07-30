@@ -1,18 +1,25 @@
 import Controller from "@ember/controller";
-import { empty } from "@ember/object/computed";
+import { action, computed } from "@ember/object";
 import { service } from "@ember/service";
-import { fmt } from "discourse/lib/computed";
-import discourseComputed from "discourse-common/utils/decorators";
 import AdminWizardsColumnsModal from "../components/modal/admin-wizards-columns";
 import { formatModel } from "../lib/wizard-submission";
 import CustomWizardAdmin from "../models/custom-wizard-admin";
 
-export default Controller.extend({
-  modal: service(),
-  downloadUrl: fmt("wizard.id", "/admin/wizards/submissions/%@/download"),
-  noResults: empty("submissions"),
-  page: 0,
-  total: 0,
+export default class AdminWizardsSubmissionsShow extends Controller {
+  @service modal;
+
+  page = 0;
+  total = 0;
+
+  @computed("wizard.id")
+  get downloadUrl() {
+    return `/admin/wizards/submissions/${this.wizard.id}/download`;
+  }
+
+  @computed("submissions.[]")
+  get noResults() {
+    return this.submissions.length === 0;
+  }
 
   loadMoreSubmissions() {
     const page = this.get("page");
@@ -24,21 +31,21 @@ export default Controller.extend({
         if (result.submissions) {
           const { submissions } = formatModel(result);
 
-          this.get("submissions").pushObjects(submissions);
+          this.set("submissions", [...this.submissions, ...submissions]);
         }
       })
       .finally(() => {
         this.set("loadingMore", false);
       });
-  },
+  }
 
-  @discourseComputed("submissions.[]", "fields.@each.enabled")
-  displaySubmissions(submissions, fields) {
-    let result = [];
-    let enabledFields = fields.filter((f) => f.enabled);
+  @computed("submissions.[]", "fields.@each.enabled")
+  get displaySubmissions() {
+    const result = [];
+    const enabledFields = this.fields.filter((field) => field.enabled);
 
-    submissions.forEach((submission) => {
-      let sub = {};
+    this.submissions.forEach((submission) => {
+      const sub = {};
       enabledFields.forEach((field) => {
         sub[field.id] = submission[field.id];
       });
@@ -46,27 +53,27 @@ export default Controller.extend({
     });
 
     return result;
-  },
+  }
 
-  actions: {
-    loadMore() {
-      if (!this.loadingMore && this.submissions.length < this.total) {
-        this.set("page", this.get("page") + 1);
-        this.loadMoreSubmissions();
-      }
-    },
+  @action
+  loadMore() {
+    if (!this.loadingMore && this.submissions.length < this.total) {
+      this.set("page", this.page + 1);
+      this.loadMoreSubmissions();
+    }
+  }
 
-    showEditColumnsModal() {
-      return this.modal.show(AdminWizardsColumnsModal, {
-        model: {
-          columns: this.get("fields"),
-          reset: () => {
-            this.get("fields").forEach((field) => {
-              field.set("enabled", true);
-            });
-          },
+  @action
+  showEditColumnsModal() {
+    return this.modal.show(AdminWizardsColumnsModal, {
+      model: {
+        columns: this.fields,
+        reset: () => {
+          this.fields.forEach((field) => {
+            field.set("enabled", true);
+          });
         },
-      });
-    },
-  },
-});
+      },
+    });
+  }
+}

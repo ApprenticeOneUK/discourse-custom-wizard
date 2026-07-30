@@ -1,6 +1,6 @@
 import { service } from "@ember/service";
 import DiscourseRoute from "discourse/routes/discourse";
-import I18n from "I18n";
+import { i18n } from "discourse-i18n";
 import { findCustomWizard, updateCachedWizard } from "../models/custom-wizard";
 
 export default DiscourseRoute.extend({
@@ -8,7 +8,7 @@ export default DiscourseRoute.extend({
 
   titleToken() {
     const wizard = this.modelFor("custom-wizard");
-    return wizard ? wizard.name || wizard.id : I18n.t("wizard.custom_title");
+    return wizard ? wizard.name || wizard.id : i18n("wizard.custom_title");
   },
 
   beforeModel(transition) {
@@ -22,7 +22,7 @@ export default DiscourseRoute.extend({
   },
 
   showDialog(wizardModel) {
-    const title = I18n.t("wizard.incomplete_submission.title", {
+    const title = i18n("wizard.incomplete_submission.title", {
       date: moment(wizardModel.submission_last_updated_at).format(
         "MMMM Do YYYY"
       ),
@@ -30,14 +30,14 @@ export default DiscourseRoute.extend({
 
     const buttons = [
       {
-        label: I18n.t("wizard.incomplete_submission.restart"),
+        label: i18n("wizard.incomplete_submission.restart"),
         class: "btn btn-default",
         action: () => {
           wizardModel.restart();
         },
       },
       {
-        label: I18n.t("wizard.incomplete_submission.resume"),
+        label: i18n("wizard.incomplete_submission.resume"),
         class: "btn btn-primary",
       },
     ];

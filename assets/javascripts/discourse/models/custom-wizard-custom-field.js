@@ -1,3 +1,4 @@
+/* eslint-disable ember/no-classic-classes */
 import EmberObject from "@ember/object";
 import { isEmpty } from "@ember/utils";
 import { ajax } from "discourse/lib/ajax";

@@ -1,3 +1,4 @@
+/* eslint-disable ember/no-actions-hash */
 import { service } from "@ember/service";
 import { ajax } from "discourse/lib/ajax";
 import DiscourseRoute from "discourse/routes/discourse";

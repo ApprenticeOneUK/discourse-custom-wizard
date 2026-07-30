@@ -19,7 +19,7 @@ export default {
       window.location.href = wizardUrl;
     });
 
-    withPluginApi("0.8.36", (api) => {
+    withPluginApi((api) => {
       api.onAppEvent("page:changed", (data) => {
         const currentUser = api.getCurrentUser();
 

@@ -1,9 +1,9 @@
 import { action } from "@ember/object";
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
+import getUrl from "discourse/lib/get-url";
 import { withPluginApi } from "discourse/lib/plugin-api";
 import DiscourseURL from "discourse/lib/url";
-import getUrl from "discourse-common/lib/get-url";
 import CustomWizardTextareaEditor from "../components/custom-wizard-textarea-editor";
 
 export default {
@@ -23,7 +23,7 @@ export default {
       return existing.apply(this, [path, opts]);
     };
 
-    withPluginApi("0.8.36", (api) => {
+    withPluginApi((api) => {
       api.modifyClass(
         "component:d-navigation",
         (Superclass) =>

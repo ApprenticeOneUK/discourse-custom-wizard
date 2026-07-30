@@ -1,16 +1,15 @@
-import DateInput from "discourse/components/date-input";
-import discourseComputed from "discourse-common/utils/decorators";
+import DDateInput from "discourse/ui-kit/d-date-input";
 
-export default DateInput.extend({
-  useNativePicker: false,
+export default class CustomWizardDateInput extends DDateInput {
+  useNativePicker = false;
 
-  @discourseComputed()
-  placeholder() {
+  get placeholder() {
     return this.format;
-  },
+  }
+
   _opts() {
     return {
       format: this.format || "LL",
     };
-  },
-});
+  }
+}

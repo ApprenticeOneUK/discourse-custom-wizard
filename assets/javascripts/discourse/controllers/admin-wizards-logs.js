@@ -1,5 +1,6 @@
+/* eslint-disable ember/no-classic-classes */
 import Controller from "@ember/controller";
-import { default as discourseComputed } from "discourse-common/utils/decorators";
+import { default as discourseComputed } from "discourse/lib/decorators";
 
 export default Controller.extend({
   documentationUrl:

@@ -33,7 +33,7 @@
   position: relative;
   padding: 25px 7px 7px 7px;
   margin-bottom: 10px;
-  background: rgba(var(--secondary-rgb), 0.5);
+  background: rgb(var(--secondary-rgb), 0.5);
   border: 2px solid var(--primary-low);
 
   .d-icon {
@@ -56,7 +56,7 @@
   a.remove-input {
     position: absolute;
     right: -13px;
-    top: 0px;
+    top: 0;
     padding: 4px;
     display: flex;
     align-items: center;

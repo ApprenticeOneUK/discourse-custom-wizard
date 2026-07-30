@@ -1,3 +1,4 @@
+/* eslint-disable ember/no-classic-classes */
 import Route from "@ember/routing/route";
 import { service } from "@ember/service";
 import { getCachedWizard } from "../models/custom-wizard";

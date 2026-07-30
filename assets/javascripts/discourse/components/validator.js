@@ -1,3 +1,4 @@
+/* eslint-disable ember/no-classic-classes, ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
 import { equal } from "@ember/object/computed";
 import { ajax } from "discourse/lib/ajax";

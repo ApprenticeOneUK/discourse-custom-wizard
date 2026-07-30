@@ -3,9 +3,7 @@ import { test } from "qunit";
 import {
   acceptance,
   count,
-  exists,
   query,
-  visible,
 } from "discourse/tests/helpers/qunit-helpers";
 import { stepNotPermitted, update, wizard } from "../helpers/wizard";
 
@@ -16,7 +14,7 @@ acceptance("Step | Not permitted", function (needs) {
 
   test("Shows not permitted message", async function (assert) {
     await visit("/w/wizard");
-    assert.ok(exists(".step-message.not-permitted"));
+    assert.dom(".step-message.not-permitted").exists();
   });
 });
 
@@ -42,14 +40,14 @@ acceptance("Step | Step", function (needs) {
       "Text inputs!"
     );
     assert.strictEqual(count(".wizard-step-form .wizard-field"), 6);
-    assert.ok(visible(".wizard-step-footer .wizard-progress"), true);
-    assert.ok(visible(".wizard-step-footer .wizard-buttons"), true);
+    assert.dom(".wizard-step-footer .wizard-progress").isVisible();
+    assert.dom(".wizard-step-footer .wizard-buttons").isVisible();
   });
 
   test("Goes to the next step", async function (assert) {
     await visit("/w/wizard");
-    assert.ok(visible(".wizard-step.step_1"), true);
+    assert.dom(".wizard-step.step_1").isVisible();
     await click(".wizard-btn.next");
-    assert.ok(visible(".wizard-step.step_2"), true);
+    assert.dom(".wizard-step.step_2").isVisible();
   });
 });

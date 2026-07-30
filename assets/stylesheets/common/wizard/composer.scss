@@ -31,13 +31,14 @@ body.custom-wizard {
     padding: 1em;
     top: 25px;
 
-    @media screen and (max-width: 424px) {
+    @media screen and (width <= 424px) {
       min-width: 300px;
     }
 
     input {
       width: 95%;
     }
+
     h3 {
       margin-bottom: 0.5em;
     }
@@ -82,7 +83,6 @@ body.custom-wizard {
   .d-editor-button-bar {
     display: flex;
     align-items: center;
-    border-bottom: none;
     min-height: 30px;
     padding-left: 3px;
     border-bottom: 1px solid var(--primary-low);
@@ -123,9 +123,10 @@ body.custom-wizard {
     width: 100%;
     margin: 0;
     min-height: auto;
-    word-wrap: break-word;
-    -webkit-appearance: none;
+    overflow-wrap: break-word;
+    appearance: none;
     border-radius: 0;
+
     &:focus {
       box-shadow: none;
       border: 0;
@@ -167,7 +168,6 @@ body.custom-wizard {
   }
 
   ////
-
   .d-editor {
     min-height: 200px;
 
@@ -203,7 +203,7 @@ body.custom-wizard {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(var(--primary-rgb), 0.8);
+    background-color: rgb(var(--primary-rgb), 0.8);
   }
 
   .wizard-composer-hyperlink-contents {
@@ -242,7 +242,6 @@ body.custom-wizard {
   }
 
   // Markdown table styles for wizard composer preview
-
   .cooked,
   .d-editor-preview {
     a.mention {
@@ -260,6 +259,7 @@ body.custom-wizard {
 
       tr {
         border-bottom: 1px solid var(--primary-low);
+
         &.highlighted {
           animation: background-fade-highlight 2.5s ease-out;
         }

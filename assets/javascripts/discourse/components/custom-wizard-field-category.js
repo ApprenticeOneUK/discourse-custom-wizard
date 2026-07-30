@@ -1,12 +1,13 @@
+/* eslint-disable ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
+import { observes } from "discourse/lib/decorators";
 import Category from "discourse/models/category";
-import { observes } from "discourse-common/utils/decorators";
 
-export default Component.extend({
-  categories: [],
+export default class CustomWizardFieldCategory extends Component {
+  categories = [];
 
   didInsertElement() {
-    this._super(...arguments);
+    super.didInsertElement(...arguments);
     const property = this.field.property || "id";
     const value = this.field.value;
 
@@ -23,7 +24,7 @@ export default Component.extend({
         }, [])
       );
     }
-  },
+  }
 
   @observes("categories")
   setValue() {
@@ -41,5 +42,5 @@ export default Component.extend({
         }, [])
       );
     }
-  },
-});
+  }
+}

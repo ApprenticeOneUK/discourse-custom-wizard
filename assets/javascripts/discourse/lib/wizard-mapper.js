@@ -1,6 +1,6 @@
-import { A } from "@ember/array";
 import EmberObject from "@ember/object";
-import I18n from "I18n";
+import { trackedArray } from "@ember/reactive/collections";
+import { i18n } from "discourse-i18n";
 
 // Inputs
 
@@ -19,7 +19,7 @@ function mapInputTypes(types) {
   return types.map(function (type) {
     return {
       id: type,
-      name: I18n.t(`admin.wizard.input.${type}.name`),
+      name: i18n(`admin.wizard.input.${type}.name`),
     };
   });
 }
@@ -87,7 +87,7 @@ function connectorContent(connectorType, inputType, opts) {
   return content.map(function (item) {
     return {
       id: item,
-      name: I18n.t(`admin.wizard.connector.${item}`),
+      name: i18n(`admin.wizard.connector.${item}`),
     };
   });
 }
@@ -157,7 +157,7 @@ function newInput(options = {}, count) {
 
   let params = {
     type: inputType,
-    pairs: A([
+    pairs: trackedArray([
       newPair(
         inputType,
         Object.assign({}, options, { index: 0, pairCount: 1 })

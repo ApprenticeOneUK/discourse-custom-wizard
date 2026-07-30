@@ -1,5 +1,6 @@
+/* eslint-disable ember/no-actions-hash, ember/no-classic-classes, ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
-import { observes } from "discourse-common/utils/decorators";
+import { observes } from "discourse/lib/decorators";
 
 export default Component.extend({
   @observes("dateTime")

@@ -1,59 +1,130 @@
+/* eslint-disable ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
-import { action } from "@ember/object";
-import { equal, notEmpty } from "@ember/object/computed";
-import discourseComputed from "discourse-common/utils/decorators";
-import I18n from "I18n";
+import { action, computed } from "@ember/object";
+import { classNameBindings } from "@ember-decorators/component";
+import { i18n } from "discourse-i18n";
 
-export default Component.extend({
-  classNameBindings: ["value.type"],
-  isText: equal("value.type", "text"),
-  isComposer: equal("value.type", "composer"),
-  isDate: equal("value.type", "date"),
-  isTime: equal("value.type", "time"),
-  isDateTime: equal("value.type", "date_time"),
-  isNumber: equal("value.type", "number"),
-  isCheckbox: equal("value.type", "checkbox"),
-  isUrl: equal("value.type", "url"),
-  isUpload: equal("value.type", "upload"),
-  isDropdown: equal("value.type", "dropdown"),
-  isTag: equal("value.type", "tag"),
-  isCategory: equal("value.type", "category"),
-  isTopic: equal("value.type", "topic"),
-  isGroup: equal("value.type", "group"),
-  isUserSelector: equal("value.type", "user_selector"),
-  isSubmittedAt: equal("field", "submitted_at"),
-  isComposerPreview: equal("value.type", "composer_preview"),
-  textState: "text-collapsed",
-  toggleText: I18n.t("admin.wizard.expand_text"),
+@classNameBindings("value.type")
+export default class WizardTableField extends Component {
+  textState = "text-collapsed";
+  toggleText = i18n("admin.wizard.expand_text");
 
-  @discourseComputed("value", "isUser", "isSubmittedAt")
-  hasValue(value, isUser, isSubmittedAt) {
-    if (isUser || isSubmittedAt) {
-      return value;
+  @computed("value.type")
+  get isText() {
+    return this.value.type === "text";
+  }
+
+  @computed("value.type")
+  get isComposer() {
+    return this.value.type === "composer";
+  }
+
+  @computed("value.type")
+  get isDate() {
+    return this.value.type === "date";
+  }
+
+  @computed("value.type")
+  get isTime() {
+    return this.value.type === "time";
+  }
+
+  @computed("value.type")
+  get isDateTime() {
+    return this.value.type === "date_time";
+  }
+
+  @computed("value.type")
+  get isNumber() {
+    return this.value.type === "number";
+  }
+
+  @computed("value.type")
+  get isCheckbox() {
+    return this.value.type === "checkbox";
+  }
+
+  @computed("value.type")
+  get isUrl() {
+    return this.value.type === "url";
+  }
+
+  @computed("value.type")
+  get isUpload() {
+    return this.value.type === "upload";
+  }
+
+  @computed("value.type")
+  get isDropdown() {
+    return this.value.type === "dropdown";
+  }
+
+  @computed("value.type")
+  get isTag() {
+    return this.value.type === "tag";
+  }
+
+  @computed("value.type")
+  get isCategory() {
+    return this.value.type === "category";
+  }
+
+  @computed("value.type")
+  get isTopic() {
+    return this.value.type === "topic";
+  }
+
+  @computed("value.type")
+  get isGroup() {
+    return this.value.type === "group";
+  }
+
+  @computed("value.type")
+  get isUserSelector() {
+    return this.value.type === "user_selector";
+  }
+
+  @computed("field")
+  get isSubmittedAt() {
+    return this.field === "submitted_at";
+  }
+
+  @computed("value.type")
+  get isComposerPreview() {
+    return this.value.type === "composer_preview";
+  }
+
+  @computed("value", "isUser", "isSubmittedAt")
+  get hasValue() {
+    if (this.isUser || this.isSubmittedAt) {
+      return this.value;
     }
-    return value && value.value;
-  },
+    return this.value && this.value.value;
+  }
 
-  @discourseComputed("field", "value.type")
-  isUser(field, type) {
-    return field === "username" || field === "user" || type === "user";
-  },
+  @computed("field", "value.type")
+  get isUser() {
+    return (
+      this.field === "username" ||
+      this.field === "user" ||
+      this.value.type === "user"
+    );
+  }
 
-  @discourseComputed("value.type")
-  isLongtext(type) {
-    return type === "textarea" || type === "long_text";
-  },
+  @computed("value.type")
+  get isLongtext() {
+    return ["textarea", "long_text"].includes(this.value.type);
+  }
 
-  @discourseComputed("value")
-  checkboxValue(value) {
-    const isCheckbox = this.get("isCheckbox");
-    if (isCheckbox) {
+  @computed("value")
+  get checkboxValue() {
+    if (this.isCheckbox) {
       return (
-        value.value === true ||
-        (Array.isArray(value.value) && value.value.includes("true"))
+        this.value.value === true ||
+        (Array.isArray(this.value.value) && this.value.value.includes("true"))
       );
     }
-  },
+  }
 
   @action
   expandText() {
@@ -61,28 +132,26 @@ export default Component.extend({
 
     if (state === "text-collapsed") {
       this.set("textState", "text-expanded");
-      this.set("toggleText", I18n.t("admin.wizard.collapse_text"));
+      this.set("toggleText", i18n("admin.wizard.collapse_text"));
     } else if (state === "text-expanded") {
       this.set("textState", "text-collapsed");
-      this.set("toggleText", I18n.t("admin.wizard.expand_text"));
+      this.set("toggleText", i18n("admin.wizard.expand_text"));
     }
-  },
+  }
 
-  @discourseComputed("value")
-  file(value) {
-    const isUpload = this.get("isUpload");
-    if (isUpload) {
-      return value.value;
+  @computed("value")
+  get file() {
+    if (this.isUpload) {
+      return this.value.value;
     }
-  },
+  }
 
-  @discourseComputed("value")
-  submittedUsers(value) {
-    const isUserSelector = this.get("isUserSelector");
+  @computed("value")
+  get submittedUsers() {
     const users = [];
 
-    if (isUserSelector) {
-      const userData = value.value;
+    if (this.isUserSelector) {
+      const userData = this.value.value;
       const usernames = [];
 
       if (userData.indexOf(",")) {
@@ -98,42 +167,43 @@ export default Component.extend({
       }
     }
     return users;
-  },
+  }
 
-  @discourseComputed("isUser", "field", "value")
-  username(isUser, field, value) {
-    if (isUser) {
-      return value.username;
+  @computed("isUser", "field", "value")
+  get username() {
+    if (this.isUser) {
+      return this.value.username;
     }
-    if (field === "username") {
-      return value.value;
+    if (this.field === "username") {
+      return this.value.value;
     }
     return null;
-  },
+  }
 
-  showUsername: notEmpty("username"),
+  @computed("username")
+  get showUsername() {
+    return Boolean(this.username);
+  }
 
-  @discourseComputed("username")
-  userProfileUrl(username) {
-    if (username) {
-      return `/u/${username}`;
+  @computed("username")
+  get userProfileUrl() {
+    if (this.username) {
+      return `/u/${this.username}`;
     }
     return "/";
-  },
+  }
 
-  @discourseComputed("value")
-  categoryUrl(value) {
-    const isCategory = this.get("isCategory");
-    if (isCategory) {
-      return `/c/${value.value}`;
+  @computed("value")
+  get categoryUrl() {
+    if (this.isCategory) {
+      return `/c/${this.value.value}`;
     }
-  },
+  }
 
-  @discourseComputed("value")
-  groupUrl(value) {
-    const isGroup = this.get("isGroup");
-    if (isGroup) {
-      return `/g/${value.value}`;
+  @computed("value")
+  get groupUrl() {
+    if (this.isGroup) {
+      return `/g/${this.value.value}`;
     }
-  },
-});
+  }
+}

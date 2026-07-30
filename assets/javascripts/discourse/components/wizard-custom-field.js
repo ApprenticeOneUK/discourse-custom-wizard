@@ -1,7 +1,8 @@
+/* eslint-disable ember/no-actions-hash, ember/no-classic-classes, ember/no-classic-components, ember/no-mixins, ember/require-tagless-components */
 import Component from "@ember/component";
 import { computed } from "@ember/object";
 import { equal, or } from "@ember/object/computed";
-import { default as discourseComputed } from "discourse-common/utils/decorators";
+import { default as discourseComputed } from "discourse/lib/decorators";
 import { selectKitContent } from "../lib/wizard";
 import wizardSchema from "../lib/wizard-schema";
 import UndoChanges from "../mixins/undo-changes";

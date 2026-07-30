@@ -1,11 +1,12 @@
+/* eslint-disable ember/no-actions-hash, ember/no-classic-classes */
 import Controller from "@ember/controller";
 import { and, equal, not } from "@ember/object/computed";
 import { service } from "@ember/service";
 import { underscore } from "@ember/string";
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
-import { default as discourseComputed } from "discourse-common/utils/decorators";
-import I18n from "I18n";
+import { default as discourseComputed } from "discourse/lib/decorators";
+import { i18n } from "discourse-i18n";
 import { selectKitContent } from "../lib/wizard";
 import CustomWizardApi from "../models/custom-wizard-api";
 
@@ -78,19 +79,25 @@ export default Controller.extend({
 
   actions: {
     addParam() {
-      this.get("api.authParams").pushObject({});
+      this.api.authParams.push({});
     },
 
     removeParam(param) {
-      this.get("api.authParams").removeObject(param);
+      const index = this.api.authParams.indexOf(param);
+      if (index !== -1) {
+        this.api.authParams.splice(index, 1);
+      }
     },
 
     addEndpoint() {
-      this.get("api.endpoints").pushObject({});
+      this.api.endpoints.push({});
     },
 
     removeEndpoint(endpoint) {
-      this.get("api.endpoints").removeObject(endpoint);
+      const index = this.api.endpoints.indexOf(endpoint);
+      if (index !== -1) {
+        this.api.endpoints.splice(index, 1);
+      }
     },
 
     authorize() {
@@ -169,7 +176,7 @@ export default Controller.extend({
         for (let rp of requiredParams) {
           if (!api[rp]) {
             let key = rp.replace("auth", "");
-            error = `${I18n.t(
+            error = `${i18n(
               `admin.wizard.api.auth.${underscore(key)}`
             )} is required for ${authType}`;
             break;

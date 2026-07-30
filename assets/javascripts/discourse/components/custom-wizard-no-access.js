@@ -1,41 +1,41 @@
-import { getOwner } from "@ember/application";
+/* eslint-disable ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
+import { action, computed } from "@ember/object";
+import { getOwner } from "@ember/owner";
 import { dasherize } from "@ember/string";
+import { classNameBindings } from "@ember-decorators/component";
 import cookie from "discourse/lib/cookie";
-import getURL from "discourse-common/lib/get-url";
-import discourseComputed from "discourse-common/utils/decorators";
+import getURL from "discourse/lib/get-url";
 import CustomWizard from "../models/custom-wizard";
 
-export default Component.extend({
-  classNameBindings: [":wizard-no-access", "reasonClass"],
+@classNameBindings(":wizard-no-access", "reasonClass")
+export default class CustomWizardNoAccess extends Component {
+  @computed("reason")
+  get reasonClass() {
+    return dasherize(this.reason);
+  }
 
-  @discourseComputed("reason")
-  reasonClass(reason) {
-    return dasherize(reason);
-  },
-
-  @discourseComputed
-  siteName() {
+  get siteName() {
     return this.siteSettings.title || "";
-  },
+  }
 
-  @discourseComputed("reason")
-  showLoginButton(reason) {
-    return reason === "requiresLogin";
-  },
+  @computed("reason")
+  get showLoginButton() {
+    return this.reason === "requiresLogin";
+  }
 
-  actions: {
-    skip() {
-      if (this.currentUser) {
-        CustomWizard.skip(this.get("wizardId"));
-      } else {
-        window.location = getURL("/");
-      }
-    },
+  @action
+  skip() {
+    if (this.currentUser) {
+      CustomWizard.skip(this.wizardId);
+    } else {
+      window.location = getURL("/");
+    }
+  }
 
-    showLogin() {
-      cookie("destination_url", getURL(`/w/${this.get("wizardId")}`));
-      getOwner(this).lookup("route:application").send("showLogin");
-    },
-  },
-});
+  @action
+  showLogin() {
+    cookie("destination_url", getURL(`/w/${this.wizardId}`));
+    getOwner(this).lookup("route:application").send("showLogin");
+  }
+}

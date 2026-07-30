@@ -1,7 +1,6 @@
+/* eslint-disable ember/no-actions-hash, ember/no-classic-classes, ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
-import { bind } from "@ember/runloop";
-import $ from "jquery";
-import { observes } from "discourse-common/utils/decorators";
+import { observes } from "discourse/lib/decorators";
 
 export default Component.extend({
   classNames: ["wizard-similar-topics"],
@@ -9,21 +8,20 @@ export default Component.extend({
 
   didInsertElement() {
     this._super(...arguments);
-    $(document).on("click", bind(this, this.documentClick));
+    this._documentClickHandler = this.documentClick.bind(this);
+    document.addEventListener("click", this._documentClickHandler);
   },
 
   willDestroyElement() {
     this._super(...arguments);
-    $(document).off("click", bind(this, this.documentClick));
+    document.removeEventListener("click", this._documentClickHandler);
   },
 
   documentClick(e) {
     if (this._state === "destroying") {
       return;
     }
-    let $target = $(e.target);
-
-    if (!$target.hasClass("show-topics")) {
+    if (!e.target.classList.contains("show-topics")) {
       this.set("showTopics", false);
     }
   },

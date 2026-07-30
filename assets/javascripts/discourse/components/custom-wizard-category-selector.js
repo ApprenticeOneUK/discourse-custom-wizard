@@ -1,6 +1,6 @@
 import { computed } from "@ember/object";
-import { makeArray } from "discourse-common/lib/helpers";
-import CategorySelector from "select-kit/components/category-selector";
+import { makeArray } from "discourse/lib/helpers";
+import CategorySelector from "discourse/select-kit/components/category-selector";
 
 export default CategorySelector.extend({
   classNames: ["category-selector", "wizard-category-selector"],

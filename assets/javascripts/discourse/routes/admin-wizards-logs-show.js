@@ -1,4 +1,3 @@
-import { A } from "@ember/array";
 import { service } from "@ember/service";
 import DiscourseRoute from "discourse/routes/discourse";
 import CustomWizardLogs from "../models/custom-wizard-logs";
@@ -19,7 +18,7 @@ export default DiscourseRoute.extend({
   setupController(controller, model) {
     controller.setProperties({
       wizard: model.wizard,
-      logs: A(model.logs),
+      logs: model.logs,
       total: model.total,
     });
   },

@@ -3,9 +3,7 @@ import { test } from "qunit";
 import {
   acceptance,
   count,
-  exists,
   query,
-  visible,
 } from "discourse/tests/helpers/qunit-helpers";
 import tagsJson from "../fixtures/tags";
 import usersJson from "../fixtures/users";
@@ -44,25 +42,25 @@ acceptance("Field | Fields", function (needs) {
 
   test("Text", async function (assert) {
     await visit("/w/wizard");
-    assert.ok(exists(".wizard-field.text-field input.wizard-focusable"));
+    assert.dom(".wizard-field.text-field input.wizard-focusable").exists();
   });
 
   test("Textarea", async function (assert) {
     await visit("/w/wizard");
-    assert.ok(
-      visible(".wizard-field.textarea-field textarea.wizard-focusable")
-    );
+    assert
+      .dom(".wizard-field.textarea-field textarea.wizard-focusable")
+      .isVisible();
   });
 
   test("Composer", async function (assert) {
     await visit("/w/wizard");
-    assert.ok(
-      visible(".wizard-field.composer-field .wizard-field-composer textarea")
-    );
-    assert.ok(
-      exists(".wizard-field.composer-field .d-editor-button-bar button")
-    );
-    assert.ok(visible(".wizard-btn.toggle-preview"));
+    assert
+      .dom(".wizard-field.composer-field .wizard-field-composer textarea")
+      .isVisible();
+    assert
+      .dom(".wizard-field.composer-field .d-editor-button-bar button")
+      .exists();
+    assert.dom(".wizard-btn.toggle-preview").isVisible();
 
     await fillIn(
       ".wizard-field.composer-field .wizard-field-composer textarea",
@@ -79,28 +77,26 @@ acceptance("Field | Fields", function (needs) {
 
   test("Composer - Hyperlink", async function (assert) {
     await visit("/w/wizard");
-    assert.ok(
-      visible(".wizard-field.composer-field .wizard-field-composer textarea")
-    );
-    assert.ok(
-      exists(".wizard-field.composer-field .d-editor-button-bar button")
-    );
-    assert.ok(visible(".wizard-btn.toggle-preview"));
+    assert
+      .dom(".wizard-field.composer-field .wizard-field-composer textarea")
+      .isVisible();
+    assert
+      .dom(".wizard-field.composer-field .d-editor-button-bar button")
+      .exists();
+    assert.dom(".wizard-btn.toggle-preview").isVisible();
     await fillIn(
       ".wizard-field.composer-field .wizard-field-composer textarea",
       "This is a link to "
     );
-    assert.ok(
-      !exists(".d-modal.upsert-hyperlink-modal"),
-      "no hyperlink modal by default"
-    );
+    assert
+      .dom(".d-modal.upsert-hyperlink-modal")
+      .doesNotExist("no hyperlink modal by default");
     await click(
       ".wizard-field.composer-field .wizard-field-composer  .d-editor button.link"
     );
-    assert.ok(
-      exists(".d-modal.upsert-hyperlink-modal"),
-      "hyperlink modal visible"
-    );
+    assert
+      .dom(".d-modal.upsert-hyperlink-modal")
+      .exists("hyperlink modal visible");
 
     await fillIn(".d-modal__body.insert-link .inputs .link-url", "google.com");
     await fillIn(".d-modal__body.insert-link .inputs .link-text", "Google");
@@ -113,12 +109,11 @@ acceptance("Field | Fields", function (needs) {
       "adds link with url and text, prepends 'https://'"
     );
 
-    assert.ok(
-      !exists(
+    assert
+      .dom(
         ".wizard-field.composer-field .wizard-field-composer .insert-link.modal-body"
-      ),
-      "modal dismissed after submitting link"
-    );
+      )
+      .doesNotExist("modal dismissed after submitting link");
 
     await fillIn(
       ".wizard-field.composer-field .wizard-field-composer textarea",
@@ -139,42 +134,45 @@ acceptance("Field | Fields", function (needs) {
       "does not insert anything after cancelling"
     );
 
-    assert.ok(
-      !exists(".insert-link.modal-body"),
-      "modal dismissed after cancelling"
-    );
+    assert
+      .dom(".insert-link.modal-body")
+      .doesNotExist("modal dismissed after cancelling");
   });
 
   test("Text Only", async function (assert) {
     await visit("/w/wizard");
-    assert.ok(visible(".wizard-field.text-only-field label.field-label"));
+    assert.dom(".wizard-field.text-only-field label.field-label").isVisible();
   });
 
   test("Time", async function (assert) {
     await visit("/w/wizard");
-    assert.ok(visible(".wizard-field.time-field .select-kit"));
+    assert.dom(".wizard-field.time-field .select-kit").isVisible();
     await click(".wizard-field.time-field .select-kit .select-kit-header");
-    assert.ok(visible(".wizard-field.time-field .select-kit-collection"));
+    assert.dom(".wizard-field.time-field .select-kit-collection").isVisible();
   });
 
   test("Number", async function (assert) {
     await visit("/w/wizard");
-    assert.ok(visible(".wizard-field.number-field input[type='number']"));
+    assert.dom(".wizard-field.number-field input[type='number']").isVisible();
   });
 
   test("Checkbox", async function (assert) {
     await visit("/w/wizard");
-    assert.ok(visible(".wizard-field.checkbox-field input[type='checkbox']"));
+    assert
+      .dom(".wizard-field.checkbox-field input[type='checkbox']")
+      .isVisible();
   });
 
   test("Url", async function (assert) {
     await visit("/w/wizard");
-    assert.ok(visible(".wizard-field.url-field input[type='text']"));
+    assert.dom(".wizard-field.url-field input[type='text']").isVisible();
   });
 
   test("Dropdown", async function (assert) {
     await visit("/w/wizard");
-    assert.ok(visible(".wizard-field.dropdown-field .single-select-header"));
+    assert
+      .dom(".wizard-field.dropdown-field .single-select-header")
+      .isVisible();
     await click(".wizard-field.dropdown-field .select-kit-header");
     assert.strictEqual(
       count(".wizard-field.dropdown-field .select-kit-collection li"),
@@ -184,7 +182,7 @@ acceptance("Field | Fields", function (needs) {
 
   test("Tag", async function (assert) {
     await visit("/w/wizard");
-    assert.ok(visible(".wizard-field.tag-field .multi-select-header"));
+    assert.dom(".wizard-field.tag-field .multi-select-header").isVisible();
     await click(".wizard-field.tag-field .select-kit-header");
     assert.strictEqual(
       count(".wizard-field.tag-field .select-kit-collection li"),
@@ -194,27 +192,27 @@ acceptance("Field | Fields", function (needs) {
 
   test("Category", async function (assert) {
     await visit("/w/wizard");
-    assert.ok(visible(".wizard-field.category-field .multi-select-header"));
+    assert.dom(".wizard-field.category-field .multi-select-header").isVisible();
     await click(".wizard-field.category-field .select-kit-header");
-    assert.ok(
-      exists(
+    assert
+      .dom(
         ".wizard-field.category-field .select-kit-collection .select-kit-row"
       )
-    );
+      .exists();
   });
 
   test("Topic", async function (assert) {
     await visit("/w/wizard");
-    assert.ok(visible(".wizard-field.topic-field .multi-select-header"));
+    assert.dom(".wizard-field.topic-field .multi-select-header").isVisible();
     await click(".wizard-field.topic-field .select-kit-header");
-    assert.ok(
-      exists(".wizard-field.topic-field .topic-selector .select-kit-filter")
-    );
+    assert
+      .dom(".wizard-field.topic-field .topic-selector .select-kit-filter")
+      .exists();
   });
 
   test("Group", async function (assert) {
     await visit("/w/wizard");
-    assert.ok(visible(".wizard-field.group-field .single-select-header"));
+    assert.dom(".wizard-field.group-field .single-select-header").isVisible();
     await click(".wizard-field.group-field .select-kit-header");
     assert.strictEqual(
       count(".wizard-field.group-field .select-kit-collection li"),
@@ -232,9 +230,9 @@ acceptance("Field | Fields", function (needs) {
       "a".charCodeAt(0)
     );
 
-    assert.ok(
-      visible(".wizard-field.user-selector-field .d-multi-select-trigger")
-    );
+    assert
+      .dom(".wizard-field.user-selector-field .d-multi-select-trigger")
+      .isVisible();
     // TODO: add assertion for ac results. autocomplete does not appear in time.
   });
 });

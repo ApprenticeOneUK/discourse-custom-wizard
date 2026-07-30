@@ -1,12 +1,9 @@
 import { click, currentURL, fillIn, visit } from "@ember/test-helpers";
-import $ from "jquery";
 import { test } from "qunit";
 import {
   acceptance,
-  exists,
   query,
   queryAll,
-  visible,
 } from "discourse/tests/helpers/qunit-helpers";
 import selectKit from "discourse/tests/helpers/select-kit-helper";
 import {
@@ -75,49 +72,50 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
     await visit("/admin/wizards");
     const list = queryAll(".admin-controls li");
     const count = list.length;
-    assert.equal(count, 5, "There should be 5 admin tabs");
+    assert.strictEqual(count, 5, "There should be 5 admin tabs");
   });
 
   test("creating a new wizard", async (assert) => {
     await visit("/admin/wizards/wizard");
     await click(".admin-wizard-controls button");
-    assert.ok(
-      query(".message-content").innerText.includes(
-        "You're creating a new wizard"
+    assert.true(
+      Boolean(
+        query(".message-content").innerText.includes(
+          "You're creating a new wizard"
+        )
       ),
       "it displays wizard creation message"
     );
     const wizardTitle = "New wizard for testing";
     await fillIn(".wizard-header input", wizardTitle);
-    assert.equal(
-      $(".wizard-header input").val(),
+    assert.strictEqual(
+      query(".wizard-header input").value,
       wizardTitle,
       "The title input is inserted"
     );
     const wizardLink = queryAll("div.wizard-url a");
-    assert.equal(wizardLink.length, 1, "Wizard link was created");
+    assert.strictEqual(wizardLink.length, 1, "Wizard link was created");
     await click(".btn-after-time");
-    assert.ok(
-      exists(".d-date-time-input .d-time-input span.name"),
-      "a time selector is shown"
-    );
+    assert
+      .dom(".d-date-time-input .d-time-input span.name")
+      .exists("a time selector is shown");
     let timeText = query(
       ".d-date-time-input .d-time-input span.name"
     ).innerText;
     const regex = /\d{1,2}:\d\d/;
-    assert.ok(regex.test(timeText));
+    assert.true(Boolean(regex.test(timeText)));
 
     await click(".step .link-list button");
     const stepOneText = "step_1 (step_1)";
     const stepOneBtn = queryAll(`.step button:contains(${stepOneText})`);
-    assert.equal(stepOneBtn.length, 1, "Creating a step");
+    assert.strictEqual(stepOneBtn.length, 1, "Creating a step");
     const stepTitle = "step title";
     await fillIn(".wizard-custom-step input[name='title']", stepTitle);
-    const stepButtonText = $.trim(
-      $(".step div[data-id='step_1'] button").text()
-    );
-    assert.ok(
-      stepButtonText.includes(stepTitle),
+    const stepButtonText = query(
+      ".step div[data-id='step_1'] button"
+    ).textContent.trim();
+    assert.true(
+      Boolean(stepButtonText.includes(stepTitle)),
       "The step button changes according to title"
     );
     await appendText(
@@ -232,10 +230,9 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
     await click(
       ".wizard-custom-step .wizard-text-editor .d-editor button.link"
     );
-    assert.ok(
-      exists(".d-modal.upsert-hyperlink-modal"),
-      "hyperlink modal visible"
-    );
+    assert
+      .dom(".d-modal.upsert-hyperlink-modal")
+      .exists("hyperlink modal visible");
 
     await fillIn(".d-modal__body.insert-link .inputs .link-url", "google.com");
     await fillIn(".d-modal__body.insert-link .inputs .link-text", "Google");
@@ -250,24 +247,22 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
     );
 
     await click(".field .link-list button");
-    assert.ok(
-      !visible(".wizard-custom-field button.undo-changes"),
-      "clear button is not rendered"
-    );
+    assert
+      .dom(".wizard-custom-field button.undo-changes")
+      .isNotVisible("clear button is not rendered");
     const fieldOneText = "step_1_field_1 (step_1_field_1)";
     const fieldOneBtn = queryAll(`.field button:contains(${fieldOneText})`);
-    assert.equal(fieldOneBtn.length, 1, "Creating a field");
+    assert.strictEqual(fieldOneBtn.length, 1, "Creating a field");
     const fieldTitle = "field title";
     await fillIn(".wizard-custom-field input[name='label']", fieldTitle);
-    assert.ok(
-      visible(".wizard-custom-field button.undo-changes"),
-      "clear button is rendered after filling content"
-    );
-    let fieldButtonText = $.trim(
-      $(".field div[data-id='step_1_field_1'] button").text()
-    );
-    assert.ok(
-      fieldButtonText.includes(fieldTitle),
+    assert
+      .dom(".wizard-custom-field button.undo-changes")
+      .isVisible("clear button is rendered after filling content");
+    let fieldButtonText = query(
+      ".field div[data-id='step_1_field_1'] button"
+    ).textContent.trim();
+    assert.true(
+      Boolean(fieldButtonText.includes(fieldTitle)),
       "The step button changes according to title"
     );
     await fillIn(
@@ -275,11 +270,11 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
       "First step field description"
     );
     await click(`.wizard-custom-field button.undo-changes`);
-    fieldButtonText = $(".field div[data-id='step_1_field_1'] button")
-      .text()
-      .trim();
-    assert.ok(
-      fieldButtonText.includes("step_1_field_1 (step_1_field_1)"),
+    fieldButtonText = query(
+      ".field div[data-id='step_1_field_1'] button"
+    ).textContent.trim();
+    assert.true(
+      Boolean(fieldButtonText.includes("step_1_field_1 (step_1_field_1)")),
       "The field button changes to default title after clear button is clicked"
     );
     await fillIn(".wizard-custom-field input[name='label']", fieldTitle);
@@ -292,20 +287,24 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
     );
     await fieldTypeDropdown.expand();
     await fieldTypeDropdown.selectRowByValue("text");
-    assert.ok(
-      query(".wizard-custom-field .message-content").innerText.includes(
-        "You're editing a field"
+    assert.true(
+      Boolean(
+        query(".wizard-custom-field .message-content").innerText.includes(
+          "You're editing a field"
+        )
       ),
       "Text tipe for field correctly selected"
     );
     await click(".action .link-list button");
     const actionOneText = "action_1 (action_1)";
     const actionOneBtn = queryAll(`.action button:contains(${actionOneText})`);
-    assert.equal(actionOneBtn.length, 1, "Creating an action");
-    assert.ok(
-      query(
-        ".wizard-custom-action .wizard-message .message-content"
-      ).innerText.includes("Select an action type"),
+    assert.strictEqual(actionOneBtn.length, 1, "Creating an action");
+    assert.true(
+      Boolean(
+        query(
+          ".wizard-custom-action .wizard-message .message-content"
+        ).innerText.includes("Select an action type")
+      ),
       "it displays wizard select action message"
     );
     const actionTypeDropdown = selectKit(
@@ -318,26 +317,31 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
     const listDisabled = queryAll(
       ".wizard-custom-action .setting .setting-value ul li.disabled"
     );
-    assert.ok(
-      listDisabled.length === 0,
+    assert.strictEqual(
+      listDisabled.length,
+      0,
       "disabled items displayed correctly in action dropdown"
     );
-    assert.ok(
-      listEnabled.length === 11,
+    assert.strictEqual(
+      listEnabled.length,
+      11,
       "Enabled items displayed correctly in action dropdown"
     );
     await actionTypeDropdown.selectRowByValue("create_topic");
-    assert.ok(
-      query(".wizard-custom-action .message-content").innerText.includes(
-        "You're editing an action"
+    assert.true(
+      Boolean(
+        query(".wizard-custom-action .message-content").innerText.includes(
+          "You're editing an action"
+        )
       ),
       "Create type action correctly selected"
     );
     let listTopicSettings = queryAll(
       ".admin-wizard-container .wizard-custom-action .setting"
     );
-    assert.ok(
-      listTopicSettings.length === 12,
+    assert.strictEqual(
+      listTopicSettings.length,
+      12,
       "Display all settings of create topic"
     );
     await actionTypeDropdown.expand();
@@ -345,8 +349,9 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
     listTopicSettings = queryAll(
       ".admin-wizard-container .wizard-custom-action .setting"
     );
-    assert.ok(
-      listTopicSettings.length === 8,
+    assert.strictEqual(
+      listTopicSettings.length,
+      8,
       "Display all settings of open composer"
     );
     await actionTypeDropdown.expand();
@@ -354,8 +359,9 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
     listTopicSettings = queryAll(
       ".admin-wizard-container .wizard-custom-action .setting"
     );
-    assert.ok(
-      listTopicSettings.length === 4,
+    assert.strictEqual(
+      listTopicSettings.length,
+      4,
       "Display all settings of update profile"
     );
     await actionTypeDropdown.expand();
@@ -363,8 +369,9 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
     listTopicSettings = queryAll(
       ".admin-wizard-container .wizard-custom-action .setting"
     );
-    assert.ok(
-      listTopicSettings.length === 4,
+    assert.strictEqual(
+      listTopicSettings.length,
+      4,
       "Display all settings of route to"
     );
     await actionTypeDropdown.expand();
@@ -372,8 +379,9 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
     listTopicSettings = queryAll(
       ".admin-wizard-container .wizard-custom-action .setting"
     );
-    assert.ok(
-      listTopicSettings.length === 2,
+    assert.strictEqual(
+      listTopicSettings.length,
+      2,
       "the settings options is empty when no action is selected"
     );
     await actionTypeDropdown.expand();
@@ -414,26 +422,26 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
       assert.strictEqual(actualValue, "Some value", "Value is correct");
       assert.strictEqual(actualResultText, "Result text", "Text is correct");
     }
-    assert.ok(
-      !visible('.admin-wizard-buttons button:contains("Delete Wizard")'),
-      "delete wizard button not displayed"
-    );
+    assert
+      .dom(".admin-wizard-buttons button.remove")
+      .doesNotExist("delete wizard button not displayed");
     await click(".admin-wizard-buttons button");
-    assert.equal(
+    assert.strictEqual(
       currentURL(),
       "/admin/wizards/wizard/new_wizard_for_testing",
       "Wizard saved successfully"
     );
-    assert.ok(
-      visible('.admin-wizard-buttons button:contains("Delete Wizard")'),
-      "delete wizard button visible"
-    );
+    assert
+      .dom(".admin-wizard-buttons button.remove")
+      .isVisible("delete wizard button visible");
   });
   test("viewing content for a selected wizard", async (assert) => {
     await visit("/admin/wizards/wizard");
-    assert.ok(
-      query(".message-content").innerText.includes(
-        "Select a wizard, or create a new one"
+    assert.true(
+      Boolean(
+        query(".message-content").innerText.includes(
+          "Select a wizard, or create a new one"
+        )
       ),
       "it displays wizard message"
     );
@@ -441,38 +449,40 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
     await wizards.expand();
 
     await wizards.selectRowByValue("unique_wizard");
-    assert.ok(
-      query(".message-content").innerText.includes("You're editing a wizard"),
+    assert.true(
+      Boolean(
+        query(".message-content").innerText.includes("You're editing a wizard")
+      ),
       "it displays wizard message for a selected wizard"
     );
-    assert.equal(
+    assert.strictEqual(
       query(".admin-wizard-container .wizard-header input").value,
       getUniqueWizard.name,
       "The wizard name is correctly displayed"
     );
     // Save wizard Submissions
-    assert.equal(
+    assert.strictEqual(
       query(".wizard-settings .setting:nth-of-type(1) input").checked,
       getUniqueWizard.save_submissions,
       "The save submissions flag is correctly set"
     );
 
     // Multiple Submissions
-    assert.equal(
+    assert.strictEqual(
       query(".wizard-settings .setting:nth-of-type(2) input").checked,
       getUniqueWizard.multiple_submissions,
       "The multiple submissions flag is correctly set"
     );
 
     // After Signup
-    assert.equal(
+    assert.strictEqual(
       query(".wizard-settings .setting:nth-of-type(3) input").checked,
       getUniqueWizard.after_signup,
       "The after signup flag is correctly set"
     );
 
     // Prompt Completion
-    assert.equal(
+    assert.strictEqual(
       query(".wizard-settings .setting:nth-of-type(4) input").checked,
       getUniqueWizard.prompt_completion,
       "The prompt completion flag is correctly set"
@@ -485,12 +495,12 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
           i + 1
         }) button:first-child`
       );
-      assert.equal(
+      assert.strictEqual(
         query(".wizard-custom-step  input[name='title']").value,
         getUniqueWizard.steps[i].title,
         "Step title is correct"
       );
-      assert.equal(
+      assert.strictEqual(
         query(".wizard-custom-step .wizard-text-editor textarea").value,
         getUniqueWizard.steps[i].description,
         "Step description is correct"
@@ -502,13 +512,13 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
             j + 1
           }) button:first-child`
         );
-        assert.equal(
+        assert.strictEqual(
           query(".wizard-custom-field.visible .setting:nth-of-type(1) input")
             .value,
           getUniqueWizard.steps[i].fields[j].label,
           "Field title is correct"
         );
-        assert.equal(
+        assert.strictEqual(
           query(".wizard-custom-field.visible .setting:nth-of-type(3) textarea")
             .value,
           getUniqueWizard.steps[i].fields[j].description,
@@ -520,7 +530,7 @@ acceptance("Admin | Custom Wizard Unsubscribed", function (needs) {
         let summaryElement = selectTypeElement.querySelector(
           ".select-kit-selected-name"
         );
-        assert.equal(
+        assert.strictEqual(
           summaryElement.getAttribute("data-value"),
           getUniqueWizard.steps[i].fields[j].type,
           "The correct data-value is selected"

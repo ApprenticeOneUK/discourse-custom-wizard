@@ -1,15 +1,15 @@
-import { getOwner } from "@ember/application";
+/* eslint-disable ember/no-actions-hash, ember/no-classic-classes, ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
 import { computed } from "@ember/object";
 import { alias, equal, gt, or } from "@ember/object/computed";
-import { bind, later } from "@ember/runloop";
+import { getOwner } from "@ember/owner";
+import { later } from "@ember/runloop";
 import { service } from "@ember/service";
-import $ from "jquery";
 import {
   default as discourseComputed,
   observes,
-} from "discourse-common/utils/decorators";
-import I18n from "I18n";
+} from "discourse/lib/decorators";
+import { i18n } from "discourse-i18n";
 import {
   generateName,
   sentenceCase,
@@ -152,13 +152,13 @@ export default Component.extend({
       let guestIndex;
       result.forEach((r, index) => {
         if (r.id === 0) {
-          r.name = I18n.t("admin.wizard.selector.label.users");
+          r.name = i18n("admin.wizard.selector.label.users");
           guestIndex = index;
         }
       });
       result.splice(guestIndex, 0, {
         id: -1,
-        name: I18n.t("admin.wizard.selector.label.guests"),
+        name: i18n("admin.wizard.selector.label.guests"),
       });
     }
 
@@ -186,21 +186,20 @@ export default Component.extend({
       later(() => this.resetActiveType());
     }
 
-    $(document).on("click", bind(this, this.documentClick));
+    this._documentClickHandler = this.documentClick.bind(this);
+    document.addEventListener("click", this._documentClickHandler);
   },
 
   willDestroyElement() {
     this._super(...arguments);
-    $(document).off("click", bind(this, this.documentClick));
+    document.removeEventListener("click", this._documentClickHandler);
   },
 
   documentClick(e) {
     if (this._state === "destroying") {
       return;
     }
-    let $target = $(e.target);
-
-    if (!$target.parents(".type-selector").length && this.showTypes) {
+    if (!e.target.closest(".type-selector") && this.showTypes) {
       this.set("showTypes", false);
     }
   },
@@ -219,7 +218,7 @@ export default Component.extend({
 
   typeLabel(type) {
     return type
-      ? I18n.t(`admin.wizard.selector.label.${snakeCase(type)}`)
+      ? i18n(`admin.wizard.selector.label.${snakeCase(type)}`)
       : null;
   },
 

@@ -59,15 +59,15 @@ acceptance("Admin | API tab", function (needs) {
     await visit("/admin/wizards/api");
     const list = queryAll(".admin-controls li");
     const count = list.length;
-    assert.equal(count, 6, "There should be 6 admin tabs");
+    assert.strictEqual(count, 6, "There should be 6 admin tabs");
 
     // create new api
     await click(".admin-wizard-controls button");
-    assert.ok(
-      query(".wizard-header.large").innerText.includes("New API"),
+    assert.true(
+      Boolean(query(".wizard-header.large").innerText.includes("New API")),
       "it displays API creation message"
     );
-    assert.equal(
+    assert.strictEqual(
       currentURL(),
       "/admin/wizards/api/create",
       "clicking the button navigates to the correct URL"
@@ -122,7 +122,7 @@ acceptance("Admin | API tab", function (needs) {
       "group should be set"
     );
     await click(".wizard-api-header.page button.btn-primary");
-    assert.equal(
+    assert.strictEqual(
       currentURL(),
       "/admin/wizards/api/new_api",
       "clicking the button navigates to the correct URL"

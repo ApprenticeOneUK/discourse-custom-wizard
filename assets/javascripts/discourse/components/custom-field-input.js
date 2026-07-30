@@ -1,45 +1,67 @@
+/* eslint-disable ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
-import { alias, equal, or } from "@ember/object/computed";
-import discourseComputed, { observes } from "discourse-common/utils/decorators";
-import I18n from "I18n";
+import { action, computed } from "@ember/object";
+import { classNames, tagName } from "@ember-decorators/component";
+import { observes } from "discourse/lib/decorators";
+import { i18n } from "discourse-i18n";
 
-export default Component.extend({
-  tagName: "tr",
-  topicSerializers: ["topic_view", "topic_list_item"],
-  postSerializers: ["post"],
-  groupSerializers: ["basic_group"],
-  categorySerializers: ["basic_category"],
-  showInputs: or("field.new", "field.edit"),
-  classNames: ["custom-field-input"],
-  loading: or("saving", "destroying"),
-  destroyDisabled: alias("loading"),
-  closeDisabled: alias("loading"),
-  isExternal: equal("field.id", "external"),
+@tagName("tr")
+@classNames("custom-field-input")
+export default class CustomFieldInput extends Component {
+  topicSerializers = ["topic_view", "topic_list_item"];
+  postSerializers = ["post"];
+  groupSerializers = ["basic_group"];
+  categorySerializers = ["basic_category"];
+
+  @computed("field.new", "field.edit")
+  get showInputs() {
+    return this.field.new || this.field.edit;
+  }
+
+  @computed("saving", "destroying")
+  get loading() {
+    return this.saving || this.destroying;
+  }
+
+  @computed("loading")
+  get destroyDisabled() {
+    return this.loading;
+  }
+
+  @computed("loading")
+  get closeDisabled() {
+    return this.loading;
+  }
+
+  @computed("field.id")
+  get isExternal() {
+    return this.field.id === "external";
+  }
 
   didInsertElement() {
-    this._super(...arguments);
+    super.didInsertElement(...arguments);
     this.set("originalField", JSON.parse(JSON.stringify(this.field)));
-  },
+  }
 
-  @discourseComputed("field.klass")
-  serializerContent(klass) {
-    const serializers = this.get(`${klass}Serializers`);
+  @computed("field.klass")
+  get serializerContent() {
+    const serializers = this.get(`${this.field.klass}Serializers`);
 
     if (serializers) {
       return serializers.reduce((result, key) => {
         result.push({
           id: key,
-          name: I18n.t(`admin.wizard.custom_field.serializers.${key}`),
+          name: i18n(`admin.wizard.custom_field.serializers.${key}`),
         });
         return result;
       }, []);
     }
-  },
+  }
 
   @observes("field.klass")
   clearSerializersWhenClassChanges() {
     this.set("field.serializers", null);
-  },
+  }
 
   compareArrays(array1, array2) {
     return (
@@ -48,9 +70,9 @@ export default Component.extend({
         return value === array2[index];
       })
     );
-  },
+  }
 
-  @discourseComputed(
+  @computed(
     "saving",
     "isExternal",
     "field.name",
@@ -58,8 +80,8 @@ export default Component.extend({
     "field.type",
     "field.serializers"
   )
-  saveDisabled(saving, isExternal) {
-    if (saving || isExternal) {
+  get saveDisabled() {
+    if (this.saving || this.isExternal) {
       return true;
     }
 
@@ -82,51 +104,53 @@ export default Component.extend({
         return current === original;
       }
     });
-  },
+  }
 
-  actions: {
-    edit() {
-      this.set("field.edit", true);
-    },
+  @action
+  edit() {
+    this.set("field.edit", true);
+  }
 
-    close() {
-      if (this.field.edit) {
+  @action
+  close() {
+    if (this.field.edit) {
+      this.set("field.edit", false);
+    }
+  }
+
+  @action
+  destroyField() {
+    this.set("destroying", true);
+    this.removeField(this.field);
+  }
+
+  @action
+  save() {
+    this.set("saving", true);
+
+    const field = this.field;
+
+    const data = {
+      id: field.id,
+      klass: field.klass,
+      type: field.type,
+      serializers: field.serializers,
+      name: field.name,
+    };
+
+    this.saveField(data).then((result) => {
+      this.set("saving", false);
+      if (result.success) {
         this.set("field.edit", false);
+      } else {
+        this.set("saveIcon", "xmark");
       }
-    },
-
-    destroy() {
-      this.set("destroying", true);
-      this.removeField(this.field);
-    },
-
-    save() {
-      this.set("saving", true);
-
-      const field = this.field;
-
-      let data = {
-        id: field.id,
-        klass: field.klass,
-        type: field.type,
-        serializers: field.serializers,
-        name: field.name,
-      };
-
-      this.saveField(data).then((result) => {
-        this.set("saving", false);
-        if (result.success) {
-          this.set("field.edit", false);
-        } else {
-          this.set("saveIcon", "xmark");
+      setTimeout(() => {
+        if (this.isDestroyed) {
+          return;
         }
-        setTimeout(() => {
-          if (this.isDestroyed) {
-            return;
-          }
-          this.set("saveIcon", null);
-        }, 10000);
-      });
-    },
-  },
-});
+        this.set("saveIcon", null);
+      }, 10000);
+    });
+  }
+}

@@ -1,16 +1,16 @@
-import { action } from "@ember/object";
-import { alias } from "@ember/object/computed";
+import { action, computed } from "@ember/object";
 import { service } from "@ember/service";
 import { dasherize } from "@ember/string";
 import ComposerEditor from "discourse/components/composer-editor";
 import UpsertHyperlink from "discourse/components/modal/upsert-hyperlink";
+import { bind } from "discourse/lib/decorators";
 import { uploadIcon } from "discourse/lib/uploads";
-import discourseComputed, { bind } from "discourse-common/utils/decorators";
 
 export const wizardComposerEdtiorEventPrefix = "wizard-editor";
 
 export default class CustomWizardComposerEditor extends ComposerEditor {
   @service modal;
+
   allowUpload = true;
   showLink = false;
   topic = null;
@@ -20,8 +20,9 @@ export default class CustomWizardComposerEditor extends ComposerEditor {
   lastValidatedAt = "lastValidatedAt";
   popupMenuOptions = [];
   draftStatus = "null";
-  @alias("topicList.loadingMore") loadingMore;
+
   wizardEventFieldId = null;
+
   composerEventPrefix = wizardComposerEdtiorEventPrefix;
 
   init() {
@@ -38,22 +39,25 @@ export default class CustomWizardComposerEditor extends ComposerEditor {
     }
   }
 
+  @computed("topicList.loadingMore")
+  get loadingMore() {
+    return this.topicList?.loadingMore;
+  }
+
   @bind
   setupEditor(textManipulation) {
     textManipulation.placeholder.composer = this.composer;
     super.setupEditor(textManipulation);
   }
 
-  @discourseComputed
-  allowedFileTypes() {
+  get allowedFileTypes() {
     return this.siteSettings.authorized_extensions
       .split("|")
       .map((ext) => "." + ext)
       .join(",");
   }
 
-  @discourseComputed()
-  uploadIcon() {
+  get uploadIcon() {
     return uploadIcon(false, this.siteSettings);
   }
 

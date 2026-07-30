@@ -1,8 +1,9 @@
-import { A } from "@ember/array";
+/* eslint-disable ember/no-classic-classes */
 import EmberObject from "@ember/object";
+import { trackedArray } from "@ember/reactive/collections";
 import { dasherize } from "@ember/string";
 import { ajax } from "discourse/lib/ajax";
-import { default as discourseComputed } from "discourse-common/utils/decorators";
+import { default as discourseComputed } from "discourse/lib/decorators";
 
 const CustomWizardApi = EmberObject.extend({
   @discourseComputed("name")
@@ -34,14 +35,14 @@ CustomWizardApi.reopenClass({
       clientSecret: authorization.client_secret,
       username: authorization.username,
       password: authorization.password,
-      authParams: A(authorization.auth_params),
+      authParams: trackedArray(authorization.auth_params || []),
       authorized: authorization.authorized,
       accessToken: authorization.access_token,
       refreshToken: authorization.refresh_token,
       code: authorization.code,
       tokenExpiresAt: authorization.token_expires_at,
       tokenRefreshAt: authorization.token_refresh_at,
-      endpoints: A(endpoints),
+      endpoints: trackedArray(endpoints || []),
       isNew: params.isNew,
       log: params.log,
     });

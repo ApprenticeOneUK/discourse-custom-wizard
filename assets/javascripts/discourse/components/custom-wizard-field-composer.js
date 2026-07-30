@@ -1,9 +1,10 @@
+/* eslint-disable ember/no-classic-classes, ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
 import EmberObject, { action } from "@ember/object";
 import {
   default as computed,
   observes,
-} from "discourse-common/utils/decorators";
+} from "discourse/lib/decorators";
 
 export default Component.extend({
   showPreview: false,

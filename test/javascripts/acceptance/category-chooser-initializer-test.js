@@ -53,7 +53,7 @@ acceptance("Category Chooser Initializer for regular users", function (needs) {
     let categories = Array.from(
       document.querySelectorAll(".category-chooser .category-row")
     ).filter((category) => category.getAttribute("data-name")); // Filter elements with a data-name attribute
-    assert.equal(
+    assert.strictEqual(
       categories.length,
       3,
       "Correct number of categories are displayed"
@@ -61,19 +61,23 @@ acceptance("Category Chooser Initializer for regular users", function (needs) {
     const categoryNames = ["General", "Category 1", "Category 2"];
 
     categoryNames.forEach((categoryName) => {
-      assert.ok(
-        categories.some(
-          (category) => category.getAttribute("data-name") === categoryName
+      assert.true(
+        Boolean(
+          categories.some(
+            (category) => category.getAttribute("data-name") === categoryName
+          )
         ),
         `Category '${categoryName}' is displayed`
       );
     });
 
     const categoryNameWithCustomField = "Category with custom field";
-    assert.notOk(
-      categories.some(
-        (category) =>
-          category.getAttribute("data-name") === categoryNameWithCustomField
+    assert.false(
+      Boolean(
+        categories.some(
+          (category) =>
+            category.getAttribute("data-name") === categoryNameWithCustomField
+        )
       ),
       `Category '${categoryNameWithCustomField}' is not displayed`
     );
@@ -130,7 +134,7 @@ acceptance("Category Chooser Initializer for Admins", function (needs) {
     let categories = Array.from(
       document.querySelectorAll(".category-chooser .category-row")
     ).filter((category) => category.getAttribute("data-name")); // Filter elements with a data-name attribute
-    assert.equal(
+    assert.strictEqual(
       categories.length,
       4,
       "Correct number of categories are displayed"
@@ -143,9 +147,11 @@ acceptance("Category Chooser Initializer for Admins", function (needs) {
     ];
 
     categoryNames.forEach((categoryName) => {
-      assert.ok(
-        categories.some(
-          (category) => category.getAttribute("data-name") === categoryName
+      assert.true(
+        Boolean(
+          categories.some(
+            (category) => category.getAttribute("data-name") === categoryName
+          )
         ),
         `Category '${categoryName}' is displayed`
       );
@@ -202,7 +208,7 @@ acceptance("Category Chooser Initializer for Staff", function (needs) {
     let categories = Array.from(
       document.querySelectorAll(".category-chooser .category-row")
     ).filter((category) => category.getAttribute("data-name")); // Filter elements with a data-name attribute
-    assert.equal(
+    assert.strictEqual(
       categories.length,
       4,
       "Correct number of categories are displayed"
@@ -215,9 +221,11 @@ acceptance("Category Chooser Initializer for Staff", function (needs) {
     ];
 
     categoryNames.forEach((categoryName) => {
-      assert.ok(
-        categories.some(
-          (category) => category.getAttribute("data-name") === categoryName
+      assert.true(
+        Boolean(
+          categories.some(
+            (category) => category.getAttribute("data-name") === categoryName
+          )
         ),
         `Category '${categoryName}' is displayed`
       );

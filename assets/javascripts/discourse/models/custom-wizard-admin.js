@@ -1,8 +1,8 @@
-import EmberObject from "@ember/object";
+/* eslint-disable ember/no-classic-classes */
+import EmberObject, { computed } from "@ember/object";
 import { Promise } from "rsvp";
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
-import discourseComputed from "discourse-common/utils/decorators";
 import { listProperties, snakeCase } from "../lib/wizard";
 import { buildProperties, mapped, present } from "../lib/wizard-json";
 import wizardSchema from "../lib/wizard-schema";
@@ -10,14 +10,14 @@ import wizardSchema from "../lib/wizard-schema";
 const GUEST_GROUP_ID = -1;
 
 const CustomWizardAdmin = EmberObject.extend({
-  @discourseComputed("permitted.@each.output")
-  allowGuests(permitted) {
+  allowGuests: computed("permitted.@each.output", function () {
+    const permitted = this.permitted;
     return (
       permitted &&
       permitted.filter((p) => p.output && p.output.includes(GUEST_GROUP_ID))
         .length
     );
-  },
+  }),
 
   save(opts) {
     return new Promise((resolve, reject) => {

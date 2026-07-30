@@ -1,8 +1,9 @@
+/* eslint-disable ember/no-classic-classes, ember/no-classic-components, ember/no-mixins, ember/require-tagless-components */
 import Component from "@ember/component";
 import { computed } from "@ember/object";
 import { empty, equal, or } from "@ember/object/computed";
-import { default as discourseComputed } from "discourse-common/utils/decorators";
-import I18n from "I18n";
+import { default as discourseComputed } from "discourse/lib/decorators";
+import { i18n } from "discourse-i18n";
 import { notificationLevels, selectKitContent } from "../lib/wizard";
 import UndoChanges from "../mixins/undo-changes";
 
@@ -37,7 +38,7 @@ export default Component.extend(UndoChanges, {
   availableNotificationLevels: notificationLevels.map((type) => {
     return {
       id: type,
-      name: I18n.t(`admin.wizard.action.watch_x.notification_level.${type}`),
+      name: i18n(`admin.wizard.action.watch_x.notification_level.${type}`),
     };
   }),
 
@@ -69,7 +70,7 @@ export default Component.extend(UndoChanges, {
 
     content.unshift({
       id: "wizard_completion",
-      name: I18n.t("admin.wizard.action.run_after.wizard_completion"),
+      name: i18n("admin.wizard.action.run_after.wizard_completion"),
     });
 
     return content;

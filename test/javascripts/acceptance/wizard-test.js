@@ -1,5 +1,4 @@
 import { click, visit } from "@ember/test-helpers";
-import $ from "jquery";
 import { test } from "qunit";
 import sinon from "sinon";
 import DiscourseURL from "discourse/lib/url";
@@ -7,10 +6,9 @@ import pretender, { response } from "discourse/tests/helpers/create-pretender";
 import {
   acceptance,
   count,
-  exists,
   query,
 } from "discourse/tests/helpers/qunit-helpers";
-import I18n from "I18n";
+import { i18n } from "discourse-i18n";
 import {
   wizard,
   wizardCompleted,
@@ -27,12 +25,12 @@ acceptance("Wizard | Not logged in", function (needs) {
 
   test("Requires login", async function (assert) {
     await visit("/w/wizard");
-    assert.ok(exists(".wizard-no-access.requires-login"));
+    assert.dom(".wizard-no-access.requires-login").exists();
   });
 
   test("Requires login if a step path is used", async function (assert) {
     await visit("/w/wizard/steps/1");
-    assert.ok(exists(".wizard-no-access.requires-login"));
+    assert.dom(".wizard-no-access.requires-login").exists();
   });
 });
 
@@ -44,7 +42,7 @@ acceptance("Wizard | Not permitted", function (needs) {
 
   test("Wizard no access not permitted", async function (assert) {
     await visit("/w/wizard");
-    assert.ok(exists(".wizard-no-access.not-permitted"));
+    assert.dom(".wizard-no-access.not-permitted").exists();
   });
 });
 
@@ -56,7 +54,7 @@ acceptance("Wizard | Completed", function (needs) {
 
   test("Wizard no access completed", async function (assert) {
     await visit("/w/wizard");
-    assert.ok(exists(".wizard-no-access.completed"));
+    assert.dom(".wizard-no-access.completed").exists();
   });
 });
 
@@ -73,8 +71,8 @@ acceptance("Wizard | Redirect", function (needs) {
   test("Redirect to pending Wizard", async function (assert) {
     sinon.stub(DiscourseURL, "routeTo");
     await visit("/latest");
-    assert.ok(
-      DiscourseURL.routeTo.calledWith("/w/wizard"),
+    assert.true(
+      Boolean(DiscourseURL.routeTo.calledWith("/w/wizard")),
       "pending wizard routing works"
     );
   });
@@ -82,8 +80,8 @@ acceptance("Wizard | Redirect", function (needs) {
   test("Don't redirect to pending Wizard when ingore redirect param is supplied", async function (assert) {
     sinon.stub(DiscourseURL, "routeTo");
     await visit("/latest?ignore_redirect=1");
-    assert.notOk(
-      DiscourseURL.routeTo.calledWith("/w/wizard"),
+    assert.false(
+      Boolean(DiscourseURL.routeTo.calledWith("/w/wizard")),
       "pending wizard routing blocked"
     );
   });
@@ -99,23 +97,23 @@ acceptance("Wizard | Wizard", function (needs) {
 
   test("Starts", async function (assert) {
     await visit("/w/wizard");
-    assert.ok(query(".wizard-column"), true);
+    assert.true(Boolean(query(".wizard-column")), true);
   });
 
   test("Applies the wizard body class", async function (assert) {
     await visit("/w/wizard");
-    assert.ok($("body.custom-wizard").length);
+    assert.dom(document.body).hasClass("custom-wizard");
   });
 
   test("Applies the body background color", async function (assert) {
     await visit("/w/wizard");
-    assert.ok($("body")[0].style.background);
+    assert.true(Boolean(document.body.style.background));
   });
 
   test("Renders the wizard form", async function (assert) {
     await visit("/w/wizard");
-    assert.ok(exists(".wizard-column-contents .wizard-step"), true);
-    assert.ok(exists(".wizard-footer img"), true);
+    assert.dom(".wizard-column-contents .wizard-step").exists();
+    assert.dom(".wizard-footer img").exists();
   });
 
   test("Renders the first step", async function (assert) {
@@ -133,13 +131,13 @@ acceptance("Wizard | Wizard", function (needs) {
       "Text inputs!"
     );
     assert.strictEqual(count(".wizard-step-form .wizard-field"), 6);
-    assert.ok(exists(".wizard-step-footer .wizard-progress"), true);
-    assert.ok(exists(".wizard-step-footer .wizard-buttons"), true);
+    assert.dom(".wizard-step-footer .wizard-progress").exists();
+    assert.dom(".wizard-step-footer .wizard-buttons").exists();
   });
 
   test("Removes the wizard body class when navigating away", async function (assert) {
     await visit("/");
-    assert.strictEqual($("body.custom-wizard").length, 0);
+    assert.dom(document.body).doesNotHaveClass("custom-wizard");
   });
 });
 
@@ -150,28 +148,28 @@ acceptance("Wizard | Guest access", function (needs) {
 
   test("Does not require login", async function (assert) {
     await visit("/w/wizard");
-    assert.ok(!exists(".wizard-no-access.requires-login"));
+    assert.dom(".wizard-no-access.requires-login").doesNotExist();
   });
 
   test("Starts", async function (assert) {
     await visit("/w/wizard");
-    assert.ok(query(".wizard-column"), true);
+    assert.true(Boolean(query(".wizard-column")), true);
   });
 
   test("Applies the wizard body class", async function (assert) {
     await visit("/w/wizard");
-    assert.ok($("body.custom-wizard").length);
+    assert.dom(document.body).hasClass("custom-wizard");
   });
 
   test("Applies the body background color", async function (assert) {
     await visit("/w/wizard");
-    assert.ok($("body")[0].style.background);
+    assert.true(Boolean(document.body.style.background));
   });
 
   test("Renders the wizard form", async function (assert) {
     await visit("/w/wizard");
-    assert.ok(exists(".wizard-column-contents .wizard-step"), true);
-    assert.ok(exists(".wizard-footer img"), true);
+    assert.dom(".wizard-column-contents .wizard-step").exists();
+    assert.dom(".wizard-footer img").exists();
   });
 
   test("Renders the first step", async function (assert) {
@@ -189,13 +187,13 @@ acceptance("Wizard | Guest access", function (needs) {
       "Text inputs!"
     );
     assert.strictEqual(count(".wizard-step-form .wizard-field"), 6);
-    assert.ok(exists(".wizard-step-footer .wizard-progress"), true);
-    assert.ok(exists(".wizard-step-footer .wizard-buttons"), true);
+    assert.dom(".wizard-step-footer .wizard-progress").exists();
+    assert.dom(".wizard-step-footer .wizard-buttons").exists();
   });
 
   test("Removes the wizard body class when navigating away", async function (assert) {
     await visit("/");
-    assert.strictEqual($("body.custom-wizard").length, 0);
+    assert.dom(document.body).doesNotHaveClass("custom-wizard");
   });
 });
 
@@ -212,7 +210,7 @@ acceptance("Wizard | Resume on revisit", function (needs) {
     assert.strictEqual(count(".dialog-content:visible"), 1);
     assert.strictEqual(
       query(".dialog-header h3").textContent.trim(),
-      I18n.t("wizard.incomplete_submission.title", {
+      i18n("wizard.incomplete_submission.title", {
         date: moment(wizardResumeOnRevisit.submission_last_updated_at).format(
           "MMMM Do YYYY"
         ),
@@ -242,8 +240,8 @@ acceptance("Wizard | Resume on revisit", function (needs) {
     await visit("/w/wizard");
     await click(".dialog-footer .btn-default");
     assert.strictEqual(skips, 1);
-    assert.ok(
-      DiscourseURL.redirectTo.calledWith("/w/wizard"),
+    assert.true(
+      Boolean(DiscourseURL.redirectTo.calledWith("/w/wizard")),
       "resuming wizard works"
     );
   });

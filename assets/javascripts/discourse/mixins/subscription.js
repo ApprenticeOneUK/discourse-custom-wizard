@@ -1,7 +1,8 @@
-import { getOwner } from "@ember/application";
+/* eslint-disable ember/no-new-mixins */
+import { computed } from "@ember/object";
 import { readOnly } from "@ember/object/computed";
 import Mixin from "@ember/object/mixin";
-import discourseComputed from "discourse-common/utils/decorators";
+import { getOwner } from "@ember/owner";
 
 const PRODUCT_PAGE = "https://custom-wizard.pavilion.tech/pricing";
 const SUPPORT_MESSAGE =
@@ -13,10 +14,9 @@ export default Mixin.create({
   subscriptionLandingUrl: PRODUCT_PAGE,
   subscriptionClientUrl: "/admin/plugins/subscription-client",
 
-  @discourseComputed
-  adminWizards() {
+  adminWizards: computed(function () {
     return getOwner(this).lookup("controller:admin-wizards");
-  },
+  }),
 
   subscribed: readOnly("adminWizards.subscribed"),
   subscriptionType: readOnly("adminWizards.subscriptionType"),
@@ -28,16 +28,14 @@ export default Mixin.create({
     "adminWizards.subscriptionClientInstalled"
   ),
 
-  @discourseComputed("subscriptionClientInstalled")
-  subscriptionLink(subscriptionClientInstalled) {
-    return subscriptionClientInstalled
+  subscriptionLink: computed("subscriptionClientInstalled", function () {
+    return this.subscriptionClientInstalled
       ? this.subscriptionClientUrl
       : this.subscriptionLandingUrl;
-  },
+  }),
 
-  @discourseComputed("subscriptionType")
-  subscriptionCtaLink(subscriptionType) {
-    switch (subscriptionType) {
+  subscriptionCtaLink: computed("subscriptionType", function () {
+    switch (this.subscriptionType) {
       case "none":
         return PRODUCT_PAGE;
       case "standard":
@@ -49,5 +47,5 @@ export default Mixin.create({
       default:
         return PRODUCT_PAGE;
     }
-  },
+  }),
 });

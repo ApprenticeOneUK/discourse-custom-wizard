@@ -1,6 +1,7 @@
+/* eslint-disable ember/no-new-mixins, ember/no-observers */
 import { get, set } from "@ember/object";
 import Mixin from "@ember/object/mixin";
-import { deepEqual } from "discourse-common/lib/object";
+import { deepEqual } from "discourse/lib/object";
 import { listProperties } from "../lib/wizard";
 import { default as wizardSchema } from "../lib/wizard-schema";
 

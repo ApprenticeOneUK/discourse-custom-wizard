@@ -9,7 +9,7 @@ body.custom-wizard {
     text-decoration: none;
     background-color: var(--secondary);
     color: var(--primary-very-high);
-    box-shadow: 0 1px 4px rgba(var(--always-black-rgb), 0.4);
+    box-shadow: 0 1px 4px rgb(var(--always-black-rgb), 0.4);
     cursor: pointer;
 
     &.small {
@@ -35,6 +35,7 @@ body.custom-wizard {
       margin-left: 0.25em;
       font-size: 0.8em;
     }
+
     .d-icon-chevron-left {
       margin-right: 0.25em;
       font-size: 0.8em;
@@ -44,7 +45,7 @@ body.custom-wizard {
   .wizard-btn.primary {
     background-color: var(--tertiary);
     color: var(--secondary);
-    box-shadow: 0 1px 4px rgba(var(--always-black-rgb), 0.6);
+    box-shadow: 0 1px 4px rgb(var(--always-black-rgb), 0.6);
 
     &:hover,
     &:focus {

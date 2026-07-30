@@ -40,14 +40,16 @@ acceptance("Admin | Manager", function (needs) {
 
   test("viewing manager fields content", async (assert) => {
     await visit("/admin/wizards/manager");
-    assert.ok(
-      query(".message-content").innerText.includes(
-        "Export, import or destroy wizards"
+    assert.true(
+      Boolean(
+        query(".message-content").innerText.includes(
+          "Export, import or destroy wizards"
+        )
       ),
       "it displays manager message"
     );
-    assert.ok(
-      find('table tr[data-wizard-id="this-is-testing-wizard"]'),
+    assert.true(
+      Boolean(find('table tr[data-wizard-id="this-is-testing-wizard"]')),
       "table shows the wizard content list"
     );
 
@@ -58,35 +60,35 @@ acceptance("Admin | Manager", function (needs) {
     const destroyCheck = checkbox[1];
 
     const exportButton = find("#export-button");
-    assert.ok(
-      exportButton.hasAttribute("disabled"),
+    assert.true(
+      Boolean(exportButton.hasAttribute("disabled")),
       "the export button is disabled when export checkbox is unchecked"
     );
 
     await click(exportCheck);
-    assert.ok(
-      !exportButton.hasAttribute("disabled"),
+    assert.false(
+      Boolean(exportButton.hasAttribute("disabled")),
       "the export button is enabled when export checkbox is clicked"
     );
     await click(exportCheck);
-    assert.ok(
-      exportButton.hasAttribute("disabled"),
+    assert.true(
+      Boolean(exportButton.hasAttribute("disabled")),
       "the export button is disabled when export checkbox is unchecked"
     );
     const destroyButton = find("#destroy-button");
-    assert.ok(
-      destroyButton.hasAttribute("disabled"),
+    assert.true(
+      Boolean(destroyButton.hasAttribute("disabled")),
       "the destroy button is disabled when destroy checkbox is unchecked"
     );
     await click(destroyCheck);
-    assert.ok(
-      !destroyButton.hasAttribute("disabled"),
+    assert.false(
+      Boolean(destroyButton.hasAttribute("disabled")),
       "the destroy button is enabled when destroy checkbox is clicked"
     );
     await click("#destroy-button");
 
-    assert.notOk(
-      find('table tr[data-wizard-id="this-is-testing-wizard"]'),
+    assert.false(
+      Boolean(find('table tr[data-wizard-id="this-is-testing-wizard"]')),
       "the wizard row is removed after destroy button is clicked"
     );
   });

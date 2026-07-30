@@ -1,37 +1,39 @@
-import EmberObject from "@ember/object";
+/* eslint-disable ember/no-mixins */
+import EmberObject, { computed } from "@ember/object";
 import { later } from "@ember/runloop";
 import { ajax } from "discourse/lib/ajax";
-import discourseComputed from "discourse-common/utils/decorators";
 import { translationOrText } from "discourse/plugins/discourse-custom-wizard/discourse/lib/wizard";
 import ValidState from "discourse/plugins/discourse-custom-wizard/discourse/mixins/valid-state";
 
-export default EmberObject.extend(ValidState, {
-  id: null,
+export default class CustomWizardStep extends EmberObject.extend(ValidState) {
+  id = null;
 
-  @discourseComputed("wizardId", "id")
-  i18nKey(wizardId, stepId) {
-    return `${wizardId}.${stepId}`;
-  },
+  @computed("wizardId", "id")
+  get i18nKey() {
+    return `${this.wizardId}.${this.id}`;
+  }
 
-  @discourseComputed("i18nKey", "title")
-  translatedTitle(i18nKey, title) {
-    return translationOrText(`${i18nKey}.title`, title);
-  },
+  @computed("i18nKey", "title")
+  get translatedTitle() {
+    return translationOrText(`${this.i18nKey}.title`, this.title);
+  }
 
-  @discourseComputed("i18nKey", "description")
-  translatedDescription(i18nKey, description) {
-    return translationOrText(`${i18nKey}.description`, description);
-  },
+  @computed("i18nKey", "description")
+  get translatedDescription() {
+    return translationOrText(`${this.i18nKey}.description`, this.description);
+  }
 
-  @discourseComputed("index")
-  displayIndex: (index) => index + 1,
+  @computed("index")
+  get displayIndex() {
+    return this.index + 1;
+  }
 
-  @discourseComputed("fields.[]")
-  fieldsById(fields) {
+  @computed("fields.[]")
+  get fieldsById() {
     const lookup = {};
-    fields.forEach((field) => (lookup[field.get("id")] = field));
+    this.fields.forEach((field) => (lookup[field.get("id")] = field));
     return lookup;
-  },
+  }
 
   validate() {
     let allValid = true;
@@ -41,14 +43,14 @@ export default EmberObject.extend(ValidState, {
     });
 
     this.setValid(allValid);
-  },
+  }
 
   fieldError(id, description) {
-    const field = this.fields.findBy("id", id);
+    const field = this.fields.find((item) => item.id === id);
     if (field) {
       field.setValid(false, description);
     }
-  },
+  }
 
   save() {
     const wizardId = this.get("wizardId");
@@ -96,7 +98,7 @@ export default EmberObject.extend(ValidState, {
         throw message;
       }
     });
-  },
+  }
 
   handleWizardError(message) {
     this.set("message", {
@@ -104,5 +106,5 @@ export default EmberObject.extend(ValidState, {
       text: message,
     });
     later(() => this.set("message", null), 6000);
-  },
-});
+  }
+}

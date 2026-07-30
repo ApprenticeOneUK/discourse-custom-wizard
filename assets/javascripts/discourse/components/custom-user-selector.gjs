@@ -2,10 +2,10 @@ import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { array } from "@ember/helper";
 import { action } from "@ember/object";
-import DMultiSelect from "discourse/components/d-multi-select";
-import avatar from "discourse/helpers/avatar";
-import icon from "discourse/helpers/d-icon";
 import userSearch from "discourse/lib/user-search";
+import DMultiSelect from "discourse/ui-kit/d-multi-select";
+import dAvatar from "discourse/ui-kit/helpers/d-avatar";
+import dIcon from "discourse/ui-kit/helpers/d-icon";
 
 /**
  * Custom user selector component using DMultiSelect
@@ -173,12 +173,12 @@ export default class CustomUserSelector extends Component {
       <:result as |user|>
         {{#if user.isGroup}}
           <div class="group-result">
-            {{icon "users" class="group-icon"}}
+            {{dIcon "users" class="group-icon"}}
             <span class="username">{{user.name}}</span>
           </div>
         {{else}}
           <div class="user-result">
-            {{avatar user imageSize="tiny"}}
+            {{dAvatar user imageSize="tiny"}}
             <span class="username">{{user.username}}</span>
             {{#if user.name}}
               <span class="name">{{user.name}}</span>
