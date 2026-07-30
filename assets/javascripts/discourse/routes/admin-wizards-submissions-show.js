@@ -1,5 +1,3 @@
-/* eslint-disable discourse/deprecated-imports */
-import { A } from "@ember/array";
 import { service } from "@ember/service";
 import DiscourseRoute from "discourse/routes/discourse";
 import { formatModel } from "../lib/wizard-submission";
@@ -23,8 +21,8 @@ export default DiscourseRoute.extend({
 
     controller.setProperties({
       wizard: model.wizard,
-      fields: A(fields),
-      submissions: A(submissions),
+      fields,
+      submissions,
       total: model.total,
     });
   },

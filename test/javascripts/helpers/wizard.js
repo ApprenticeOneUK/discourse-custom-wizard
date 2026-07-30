@@ -1,5 +1,4 @@
-/* eslint-disable discourse/discourse-common-imports */
-import { cloneJSON } from "discourse-common/lib/object";
+import { cloneJSON } from "discourse/lib/object";
 import categoriesJson from "../fixtures/categories";
 import groupsJson from "../fixtures/groups";
 import updateJson from "../fixtures/update";

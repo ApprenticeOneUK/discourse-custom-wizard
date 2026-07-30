@@ -1,24 +1,36 @@
-/* eslint-disable discourse/deprecated-imports, discourse/discourse-common-imports, discourse/i18n-import-location, ember/no-actions-hash, ember/no-classic-classes, ember/no-jquery, simple-import-sort/imports */
-import { A } from "@ember/array";
 import Controller from "@ember/controller";
-import { empty } from "@ember/object/computed";
+import { action, computed } from "@ember/object";
 import { underscore } from "@ember/string";
-import $ from "jquery";
-import { observes } from "discourse-common/utils/decorators";
-import I18n from "I18n";
+import { observes } from "discourse/lib/decorators";
+import { autoTrackedArray } from "discourse/lib/tracked-tools";
+import { i18n } from "discourse-i18n";
 import CustomWizardManager from "../models/custom-wizard-manager";
 
-export default Controller.extend({
-  messageUrl:
-    "https://pavilion.tech/products/discourse-custom-wizard-plugin/documentation/wizard-manager",
-  messageKey: "info",
-  messageIcon: "circle-info",
-  messageClass: "info",
-  importDisabled: empty("file"),
-  exportWizards: A(),
-  destroyWizards: A(),
-  exportDisabled: empty("exportWizards"),
-  destoryDisabled: empty("destroyWizards"),
+export default class AdminWizardsManager extends Controller {
+  @autoTrackedArray wizards;
+  @autoTrackedArray exportWizards = [];
+  @autoTrackedArray destroyWizards = [];
+
+  messageUrl =
+    "https://pavilion.tech/products/discourse-custom-wizard-plugin/documentation/wizard-manager";
+  messageKey = "info";
+  messageIcon = "circle-info";
+  messageClass = "info";
+
+  @computed("file")
+  get importDisabled() {
+    return !this.file;
+  }
+
+  @computed("exportWizards.[]")
+  get exportDisabled() {
+    return this.exportWizards.length === 0;
+  }
+
+  @computed("destroyWizards.[]")
+  get destoryDisabled() {
+    return this.destroyWizards.length === 0;
+  }
 
   setMessage(type, key, opts = {}, items = []) {
     this.setProperties({
@@ -38,44 +50,45 @@ export default Controller.extend({
         messageItems: null,
       });
     }, 10000);
-  },
+  }
 
   buildWizardLink(wizard) {
     let html = `<a href='/admin/wizards/wizard/${wizard.id}'>${wizard.name}</a>`;
-    html += `<span class='action'>${I18n.t(
+    html += `<span class='action'>${i18n(
       "admin.wizard.manager.imported"
     )}</span>`;
     return {
       icon: "circle-check",
       html,
     };
-  },
+  }
 
   buildDestroyedItem(destroyed) {
     let html = `<span data-wizard-id="${destroyed.id}">${destroyed.name}</span>`;
-    html += `<span class='action'>${I18n.t(
+    html += `<span class='action'>${i18n(
       "admin.wizard.manager.destroyed"
     )}</span>`;
     return {
       icon: "circle-check",
       html,
     };
-  },
+  }
 
   buildFailureItem(failure) {
     return {
       icon: "circle-xmark",
       html: `${failure.id}: ${failure.messages}`,
     };
-  },
+  }
 
+  @action
   clearFile() {
     this.setProperties({
       file: null,
       filename: null,
     });
     document.getElementById("custom-wizard-file-upload").value = "";
-  },
+  }
 
   @observes("importing", "destroying")
   setLoadingMessages() {
@@ -85,75 +98,136 @@ export default Controller.extend({
     if (this.destroying) {
       this.setMessage("loading", "destroying");
     }
-  },
+  }
 
-  actions: {
-    upload() {
-      document.getElementById("custom-wizard-file-upload").click();
-    },
+  @action
+  upload() {
+    document.getElementById("custom-wizard-file-upload").click();
+  }
 
-    clearFile() {
-      this.clearFile();
-    },
+  @action
+  setFile(event) {
+    const maxFileSize = 512 * 1024;
+    const file = event.target.files[0];
 
-    setFile(event) {
-      let maxFileSize = 512 * 1024;
-      const file = event.target.files[0];
+    if (file === undefined) {
+      this.set("file", null);
+      return;
+    }
 
-      if (file === undefined) {
-        this.set("file", null);
-        return;
+    if (maxFileSize < file.size) {
+      this.setMessage("error", "file_size_error");
+      this.set("file", null);
+      document.getElementById("custom-wizard-file-upload").value = "";
+    } else {
+      this.setProperties({
+        file,
+        filename: file.name,
+      });
+    }
+  }
+
+  @action
+  selectWizard(event) {
+    const type = event.target.classList.contains("export")
+      ? "export"
+      : "destroy";
+    const wizards = this.get(`${type}Wizards`);
+    const checked = event.target.checked;
+
+    let wizardId = event.target.closest("tr").getAttribute("data-wizard-id");
+
+    if (wizardId) {
+      wizardId = underscore(wizardId);
+    } else {
+      return false;
+    }
+
+    if (checked) {
+      if (!wizards.includes(wizardId)) {
+        wizards.push(wizardId);
       }
-
-      if (maxFileSize < file.size) {
-        this.setMessage("error", "file_size_error");
-        this.set("file", null);
-        document.getElementById("custom-wizard-file-upload").value = "";
-      } else {
-        this.setProperties({
-          file,
-          filename: file.name,
-        });
+    } else {
+      const index = wizards.indexOf(wizardId);
+      if (index !== -1) {
+        wizards.splice(index, 1);
       }
-    },
+    }
+  }
 
-    selectWizard(event) {
-      const type = event.target.classList.contains("export")
-        ? "export"
-        : "destroy";
-      const wizards = this.get(`${type}Wizards`);
-      const checked = event.target.checked;
+  @action
+  import() {
+    const file = this.get("file");
 
-      let wizardId = event.target.closest("tr").getAttribute("data-wizard-id");
+    if (!file) {
+      this.setMessage("error", "no_file");
+      return;
+    }
 
-      if (wizardId) {
-        wizardId = underscore(wizardId);
-      } else {
-        return false;
-      }
+    const formData = new FormData();
+    formData.append("file", file);
 
-      if (checked) {
-        wizards.addObject(wizardId);
-      } else {
-        wizards.removeObject(wizardId);
-      }
-    },
+    this.set("importing", true);
+    this.setMessage("loading", "importing");
 
-    import() {
-      const file = this.get("file");
+    CustomWizardManager.import(formData)
+      .then((result) => {
+        if (result.error) {
+          this.setMessage("error", "server_error", {
+            message: result.error,
+          });
+        } else {
+          this.setMessage(
+            "success",
+            "import_complete",
+            {},
+            result.imported
+              .map((imported) => {
+                return this.buildWizardLink(imported);
+              })
+              .concat(
+                result.failures.map((failure) => {
+                  return this.buildFailureItem(failure);
+                })
+              )
+          );
 
-      if (!file) {
-        this.setMessage("error", "no_file");
-        return;
-      }
+          if (result.imported.length) {
+            this.wizards.push(...result.imported);
+          }
+        }
+        this.clearFile();
+      })
+      .finally(() => {
+        this.set("importing", false);
+      });
+  }
 
-      let $formData = new FormData();
-      $formData.append("file", file);
+  @action
+  export() {
+    const exportWizards = this.exportWizards;
 
-      this.set("importing", true);
-      this.setMessage("loading", "importing");
+    if (!exportWizards.length) {
+      this.setMessage("error", "none_selected");
+    } else {
+      CustomWizardManager.export(exportWizards);
+      exportWizards.splice(0);
+      document.querySelectorAll("input.export").forEach((input) => {
+        input.checked = false;
+      });
+    }
+  }
 
-      CustomWizardManager.import($formData)
+  @action
+  destroy() {
+    let destroyWizards = this.destroyWizards;
+
+    if (!destroyWizards.length) {
+      this.setMessage("error", "none_selected");
+    } else {
+      this.set("destroying", true);
+
+      CustomWizardManager.destroy(destroyWizards)
         .then((result) => {
           if (result.error) {
             this.setMessage("error", "server_error", {
@@ -162,11 +236,11 @@ export default Controller.extend({
           } else {
             this.setMessage(
               "success",
-              "import_complete",
+              "destroy_complete",
               {},
-              result.imported
-                .map((imported) => {
-                  return this.buildWizardLink(imported);
+              result.destroyed
+                .map((destroyed) => {
+                  return this.buildDestroyedItem(destroyed);
                 })
                 .concat(
                   result.failures.map((failure) => {
@@ -175,78 +249,22 @@ export default Controller.extend({
                 )
             );
 
-            if (result.imported.length) {
-              this.get("wizards").addObjects(result.imported);
-            }
-          }
-          this.clearFile();
-        })
-        .finally(() => {
-          this.set("importing", false);
-        });
-    },
-
-    export() {
-      const exportWizards = this.get("exportWizards");
-
-      if (!exportWizards.length) {
-        this.setMessage("error", "none_selected");
-      } else {
-        CustomWizardManager.export(exportWizards);
-        exportWizards.clear();
-        $("input.export").prop("checked", false);
-      }
-    },
-
-    destroy() {
-      let destroyWizards = this.get("destroyWizards");
-
-      if (!destroyWizards.length) {
-        this.setMessage("error", "none_selected");
-      } else {
-        this.set("destroying", true);
-
-        CustomWizardManager.destroy(destroyWizards)
-          .then((result) => {
-            if (result.error) {
-              this.setMessage("error", "server_error", {
-                message: result.error,
-              });
-            } else {
-              this.setMessage(
-                "success",
-                "destroy_complete",
-                {},
-                result.destroyed
-                  .map((destroyed) => {
-                    return this.buildDestroyedItem(destroyed);
-                  })
-                  .concat(
-                    result.failures.map((failure) => {
-                      return this.buildFailureItem(failure);
-                    })
-                  )
+            if (result.destroyed.length) {
+              const destroyedIds = result.destroyed.map((d) => d.id);
+              destroyWizards = this.destroyWizards;
+              this.wizards = this.wizards.filter(
+                (wizard) => !destroyedIds.includes(wizard.id)
               );
 
-              if (result.destroyed.length) {
-                const destroyedIds = result.destroyed.map((d) => d.id);
-                destroyWizards = this.get("destroyWizards");
-                const wizards = this.get("wizards");
-
-                wizards.removeObjects(
-                  wizards.filter((w) => {
-                    return destroyedIds.includes(w.id);
-                  })
-                );
-
-                destroyWizards.removeObjects(destroyedIds);
-              }
+              this.destroyWizards = destroyWizards.filter(
+                (wizardId) => !destroyedIds.includes(wizardId)
+              );
             }
-          })
-          .finally(() => {
-            this.set("destroying", false);
-          });
-      }
-    },
-  },
-});
+          }
+        })
+        .finally(() => {
+          this.set("destroying", false);
+        });
+    }
+  }
+}

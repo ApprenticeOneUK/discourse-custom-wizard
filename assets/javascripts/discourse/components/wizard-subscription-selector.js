@@ -1,8 +1,9 @@
-/* eslint-disable discourse/discourse-common-imports, discourse/i18n-import-location, discourse/moved-packages-import-paths, ember/avoid-leaking-state-in-ember-objects, simple-import-sort/imports */
+import { computed } from "@ember/object";
 import { service } from "@ember/service";
-import discourseComputed from "discourse-common/utils/decorators";
-import I18n from "I18n";
-import SingleSelectComponent from "select-kit/components/single-select";
+import { classNames } from "@ember-decorators/component";
+import { selectKitOptions } from "discourse/select-kit/components/select-kit";
+import SingleSelectComponent from "discourse/select-kit/components/single-select";
+import { i18n } from "discourse-i18n";
 import { filterValues } from "discourse/plugins/discourse-custom-wizard/discourse/lib/wizard-schema";
 
 const nameKey = function (feature, attribute, value) {
@@ -13,19 +14,18 @@ const nameKey = function (feature, attribute, value) {
   }
 };
 
-export default SingleSelectComponent.extend({
-  classNames: ["combo-box", "wizard-subscription-selector"],
-  subscription: service(),
-
-  selectKitOptions: {
-    autoFilterable: false,
-    filterable: false,
-    showFullTitle: true,
-    headerComponent:
-      "wizard-subscription-selector/wizard-subscription-selector-header",
-    caretUpIcon: "caret-up",
-    caretDownIcon: "caret-down",
-  },
+@classNames("combo-box", "wizard-subscription-selector")
+@selectKitOptions({
+  autoFilterable: false,
+  filterable: false,
+  showFullTitle: true,
+  headerComponent:
+    "wizard-subscription-selector/wizard-subscription-selector-header",
+  caretUpIcon: "caret-up",
+  caretDownIcon: "caret-down",
+})
+export default class WizardSubscriptionSelector extends SingleSelectComponent {
+  @service subscription;
 
   allowedSubscriptionTypes(feature, attribute, value) {
     let attributes = this.subscription.subscriptionAttributes[feature];
@@ -40,31 +40,31 @@ export default SingleSelectComponent.extend({
       }
     });
     return allowedTypes;
-  },
+  }
 
-  @discourseComputed("feature", "attribute", "wizard.allowGuests")
-  content(feature, attribute) {
-    return filterValues(this.wizard, feature, attribute)
+  @computed("feature", "attribute", "wizard.allowGuests")
+  get content() {
+    return filterValues(this.wizard, this.feature, this.attribute)
       .map((value) => {
-        let allowedSubscriptionTypes = this.allowedSubscriptionTypes(
-          feature,
-          attribute,
+        const allowedSubscriptionTypes = this.allowedSubscriptionTypes(
+          this.feature,
+          this.attribute,
           value
         );
 
-        let subscriptionRequired = false;
+        const subscriptionRequired = false;
 
-        let attrs = {
+        const attrs = {
           id: value,
-          name: I18n.t(nameKey(feature, attribute, value)),
+          name: i18n(nameKey(this.feature, this.attribute, value)),
           subscriptionRequired,
         };
         if (subscriptionRequired) {
-          let subscribed = allowedSubscriptionTypes.includes(
+          const subscribed = allowedSubscriptionTypes.includes(
             this.subscription.subscriptionType
           );
-          let selectorKey = subscribed ? "subscribed" : "not_subscribed";
-          let selectorLabel = `admin.wizard.subscription.${selectorKey}.selector`;
+          const selectorKey = subscribed ? "subscribed" : "not_subscribed";
+          const selectorLabel = `admin.wizard.subscription.${selectorKey}.selector`;
 
           attrs.disabled = !subscribed;
           attrs.selectorLabel = selectorLabel;
@@ -87,9 +87,9 @@ export default SingleSelectComponent.extend({
           return a.subscriptionType === "standard" ? -1 : 0;
         }
       });
-  },
+  }
 
   modifyComponentForRow() {
     return "wizard-subscription-selector/wizard-subscription-selector-row";
-  },
-});
+  }
+}

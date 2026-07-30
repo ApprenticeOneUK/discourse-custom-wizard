@@ -1,4 +1,3 @@
-/* eslint-disable qunit/no-assert-equal, qunit/no-loose-assertions, qunit/no-ok-equality */
 import { click, visit } from "@ember/test-helpers";
 import { test } from "qunit";
 import {
@@ -47,21 +46,25 @@ acceptance("Admin | Submissions", function (needs) {
   test("View submissions fields tab and content", async (assert) => {
     await visit("/admin/wizards/submissions");
     const wizards = selectKit(".select-kit");
-    assert.ok(
-      query(".message-content").innerText.includes(
-        "Select a wizard to see its submissions"
+    assert.true(
+      Boolean(
+        query(".message-content").innerText.includes(
+          "Select a wizard to see its submissions"
+        )
       ),
       "it displays submissions message"
     );
-    assert.ok(
-      query(".message-content").innerText.includes("Select a wizard"),
+    assert.true(
+      Boolean(query(".message-content").innerText.includes("Select a wizard")),
       "it displays list of wizards"
     );
     await wizards.expand();
     await wizards.selectRowByValue("this_is_testing_wizard");
-    assert.ok(
-      query(".message-content").innerText.includes(
-        "You're viewing the submissions of the This is testing wizard"
+    assert.true(
+      Boolean(
+        query(".message-content").innerText.includes(
+          "You're viewing the submissions of the This is testing wizard"
+        )
       ),
       "it displays submissions for a selected wizard"
     );
@@ -76,31 +79,35 @@ acceptance("Admin | Submissions", function (needs) {
         "MMM D, YYYY h:mm a"
       );
 
-      assert.equal(
+      assert.strictEqual(
         dateCell.innerText,
         expectedDate,
         `Date is displayed correctly for submission ${i + 1}`
       );
-      assert.equal(
+      assert.strictEqual(
         userCell.innerText.trim(),
         submissions[i].user.username,
         `User is displayed correctly for submission ${i + 1}`
       );
-      assert.equal(
+      assert.strictEqual(
         stepCell.innerText.trim().split("\n")[0],
         submissions[i].fields.step_1_field_1.value,
         `Step is displayed correctly for submission ${i + 1}`
       );
     }
-    assert.ok(
-      queryAll("table tbody tr").length >= 1,
+    assert.true(
+      Boolean(queryAll("table tbody tr").length >= 1),
       "Displays submissions list"
     );
 
     await wizards.expand();
     await click('[data-name="Select a wizard"]');
     const wizardContainerDiv = query(".admin-wizard-container");
-    assert.ok(wizardContainerDiv.children.length === 0, "the div is empty");
+    assert.strictEqual(
+      wizardContainerDiv.children.length,
+      0,
+      "the div is empty"
+    );
   });
   test("View submissions tab for another wizard with more steps", async (assert) => {
     await visit("/admin/wizards/submissions");
@@ -109,9 +116,11 @@ acceptance("Admin | Submissions", function (needs) {
     await wizards.expand();
     await wizards.selectRowByValue("another_wizard");
 
-    assert.ok(
-      query(".message-content").innerText.includes(
-        "You're viewing the submissions of the another wizard"
+    assert.true(
+      Boolean(
+        query(".message-content").innerText.includes(
+          "You're viewing the submissions of the another wizard"
+        )
       ),
       "it displays submissions for another wizard"
     );
@@ -129,30 +138,30 @@ acceptance("Admin | Submissions", function (needs) {
         "MMM D, YYYY h:mm a"
       );
 
-      assert.equal(
+      assert.strictEqual(
         dateCell.innerText,
         expectedDate,
         `Date is displayed correctly for submission ${i + 1}`
       );
-      assert.equal(
+      assert.strictEqual(
         userCell.innerText.trim(),
         submissions[i].user.username,
         `User is displayed correctly for submission ${i + 1}`
       );
-      assert.equal(
+      assert.strictEqual(
         step1Cell.innerText.trim().split("\n")[0],
         submissions[i].fields.step_1_field_1.value,
         `Step 1 is displayed correctly for submission ${i + 1}`
       );
-      assert.equal(
+      assert.strictEqual(
         step2Cell.innerText.trim().split("\n")[0],
         submissions[i].fields.step_2_field_1.value,
         `Step 2 is displayed correctly for submission ${i + 1}`
       );
     }
 
-    assert.ok(
-      queryAll("table tbody tr").length >= 1,
+    assert.true(
+      Boolean(queryAll("table tbody tr").length >= 1),
       "Displays submissions list for another wizard"
     );
   });
@@ -168,11 +177,14 @@ acceptance("Admin | Submissions", function (needs) {
     const userCheckbox = queryAll(
       ".edit-directory-columns-container .edit-directory-column:nth-child(2) .left-content .column-name input"
     );
-    assert.ok(userCheckbox, "User checkbox is present");
-    assert.ok(userCheckbox[0].checked, "User checkbox is checked by default");
+    assert.true(Boolean(userCheckbox), "User checkbox is present");
+    assert.true(
+      Boolean(userCheckbox[0].checked),
+      "User checkbox is checked by default"
+    );
     await click(userCheckbox[0]);
-    assert.notOk(
-      userCheckbox[0].checked,
+    assert.false(
+      Boolean(userCheckbox[0].checked),
       "User checkbox is unchecked after clicking"
     );
 
@@ -185,16 +197,19 @@ acceptance("Admin | Submissions", function (needs) {
     const submittedAtCheckbox = queryAll(
       ".edit-directory-columns-container .edit-directory-column:nth-child(1) .left-content .column-name input"
     );
-    assert.ok(submittedAtCheckbox, "Submitted At checkbox is present");
-    assert.ok(
-      submittedAtCheckbox[0].checked,
+    assert.true(
+      Boolean(submittedAtCheckbox),
+      "Submitted At checkbox is present"
+    );
+    assert.true(
+      Boolean(submittedAtCheckbox[0].checked),
       "Submitted At checkbox is checked by default"
     );
     await click(submittedAtCheckbox[0]);
 
     await click(".modal-footer .btn-primary");
-    assert.notOk(
-      submittedAtCheckbox[0].checked,
+    assert.false(
+      Boolean(submittedAtCheckbox[0].checked),
       "Submitted At checkbox is unchecked after clicking"
     );
     assert
@@ -221,7 +236,10 @@ acceptance("Admin | Submissions", function (needs) {
     await wizards.selectRowByValue("this_is_testing_wizard");
 
     const downloadLinks = queryAll(".download-link");
-    assert.ok(downloadLinks.length > 1, "Download links are present");
+    assert.true(
+      Boolean(downloadLinks.length > 1),
+      "Download links are present"
+    );
 
     const downloadLink = downloadLinks[1];
     await click(downloadLink);
@@ -229,7 +247,7 @@ acceptance("Admin | Submissions", function (needs) {
     const expectedURL =
       "/admin/wizards/submissions/this_is_testing_wizard/download";
     const actualURL = new URL(downloadLink.href);
-    assert.equal(
+    assert.strictEqual(
       actualURL.pathname,
       expectedURL,
       "Download link has correct URL"

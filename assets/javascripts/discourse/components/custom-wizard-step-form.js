@@ -1,10 +1,12 @@
-/* eslint-disable discourse/discourse-common-imports, ember/no-classic-classes, ember/no-classic-components, ember/require-tagless-components */
+/* eslint-disable ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
-import discourseComputed from "discourse-common/utils/decorators";
+import { computed } from "@ember/object";
+import { classNameBindings } from "@ember-decorators/component";
 
-export default Component.extend({
-  classNameBindings: [":wizard-step-form", "customStepClass"],
-
-  @discourseComputed("step.id")
-  customStepClass: (stepId) => `wizard-step-${stepId}`,
-});
+@classNameBindings(":wizard-step-form", "customStepClass")
+export default class CustomWizardStepForm extends Component {
+  @computed("step.id")
+  get customStepClass() {
+    return `wizard-step-${this.step.id}`;
+  }
+}

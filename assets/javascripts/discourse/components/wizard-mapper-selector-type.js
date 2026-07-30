@@ -1,17 +1,17 @@
-/* eslint-disable discourse/discourse-common-imports, ember/no-classic-classes, ember/no-classic-components, ember/require-tagless-components */
+/* eslint-disable ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
-import discourseComputed from "discourse-common/utils/decorators";
+import { computed } from "@ember/object";
+import { classNameBindings, tagName } from "@ember-decorators/component";
 
-export default Component.extend({
-  tagName: "a",
-  classNameBindings: ["active"],
-
-  @discourseComputed("item.type", "activeType")
-  active(type, activeType) {
-    return type === activeType;
-  },
+@tagName("a")
+@classNameBindings("active")
+export default class WizardMapperSelectorType extends Component {
+  @computed("item.type", "activeType")
+  get active() {
+    return this.item.type === this.activeType;
+  }
 
   click() {
     this.toggle(this.item.type);
-  },
-});
+  }
+}

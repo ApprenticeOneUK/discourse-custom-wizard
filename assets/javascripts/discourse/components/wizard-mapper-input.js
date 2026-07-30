@@ -1,9 +1,9 @@
-/* eslint-disable discourse/deprecated-imports, discourse/discourse-common-imports, ember/no-actions-hash, ember/no-classic-classes, ember/no-classic-components, ember/require-tagless-components */
-import { A } from "@ember/array";
+/* eslint-disable ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
-import { computed, set } from "@ember/object";
-import { alias, equal, not, or } from "@ember/object/computed";
-import { observes } from "discourse-common/utils/decorators";
+import { action, computed, set } from "@ember/object";
+import { trackedArray } from "@ember/reactive/collections";
+import { classNameBindings } from "@ember-decorators/component";
+import { observes } from "discourse/lib/decorators";
 import {
   connectorContent,
   defaultConnector,
@@ -12,27 +12,62 @@ import {
   newPair,
 } from "../lib/wizard-mapper";
 
-export default Component.extend({
-  classNameBindings: [":mapper-input", "inputType"],
-  inputType: alias("input.type"),
-  isConditional: equal("inputType", "conditional"),
-  isAssignment: equal("inputType", "assignment"),
-  isAssociation: equal("inputType", "association"),
-  isValidation: equal("inputType", "validation"),
-  hasOutput: or("isConditional", "isAssignment"),
-  hasPairs: or("isConditional", "isAssociation", "isValidation"),
-  canAddPair: not("isAssignment"),
-  connectors: computed(function () {
+@classNameBindings(":mapper-input", "inputType")
+export default class WizardMapperInput extends Component {
+  @computed("input.type")
+  get inputType() {
+    return this.input.type;
+  }
+
+  @computed("inputType")
+  get isConditional() {
+    return this.inputType === "conditional";
+  }
+
+  @computed("inputType")
+  get isAssignment() {
+    return this.inputType === "assignment";
+  }
+
+  @computed("inputType")
+  get isAssociation() {
+    return this.inputType === "association";
+  }
+
+  @computed("inputType")
+  get isValidation() {
+    return this.inputType === "validation";
+  }
+
+  @computed("isConditional", "isAssignment")
+  get hasOutput() {
+    return this.isConditional || this.isAssignment;
+  }
+
+  @computed("isConditional", "isAssociation", "isValidation")
+  get hasPairs() {
+    return this.isConditional || this.isAssociation || this.isValidation;
+  }
+
+  @computed("isAssignment")
+  get canAddPair() {
+    return !this.isAssignment;
+  }
+
+  @computed("input.type", "options")
+  get connectors() {
     return connectorContent("output", this.input.type, this.options);
-  }),
-  inputTypes: computed(function () {
+  }
+
+  @computed("options")
+  get inputTypes() {
     return inputTypesContent(this.options);
-  }),
+  }
 
   @observes("input.type")
   setupType() {
     if (this.hasPairs && (!this.input.pairs || this.input.pairs.length < 1)) {
-      this.send("addPair");
+      this.addPair();
     }
 
     if (this.hasOutput) {
@@ -47,33 +82,36 @@ export default Component.extend({
         );
       }
     }
-  },
+  }
 
-  actions: {
-    addPair() {
-      if (!this.input.pairs) {
-        this.set("input.pairs", A());
-      }
+  @action
+  addPair() {
+    if (!this.input.pairs) {
+      this.set("input.pairs", trackedArray());
+    }
 
-      const pairs = this.input.pairs;
-      const pairCount = pairs.length + 1;
+    const pairs = this.input.pairs;
+    const pairCount = pairs.length + 1;
 
-      pairs.forEach((p) => set(p, "pairCount", pairCount));
+    pairs.forEach((pair) => set(pair, "pairCount", pairCount));
 
-      pairs.pushObject(
-        newPair(
-          this.input.type,
-          Object.assign({}, this.options, { index: pairs.length, pairCount })
-        )
-      );
-    },
+    pairs.push(
+      newPair(
+        this.input.type,
+        Object.assign({}, this.options, { index: pairs.length, pairCount })
+      )
+    );
+  }
 
-    removePair(pair) {
-      const pairs = this.input.pairs;
-      const pairCount = pairs.length - 1;
+  @action
+  removePair(pair) {
+    const pairs = this.input.pairs;
+    const pairCount = pairs.length - 1;
 
-      pairs.forEach((p) => set(p, "pairCount", pairCount));
-      pairs.removeObject(pair);
-    },
-  },
-});
+    pairs.forEach((item) => set(item, "pairCount", pairCount));
+    const index = pairs.indexOf(pair);
+    if (index !== -1) {
+      pairs.splice(index, 1);
+    }
+  }
+}

@@ -1,14 +1,13 @@
-/* eslint-disable discourse/discourse-common-imports, discourse/moved-packages-import-paths, simple-import-sort/imports */
-import { default as discourseComputed } from "discourse-common/utils/decorators";
-import SelectKitRowComponent from "select-kit/components/select-kit/select-kit-row";
+import { computed } from "@ember/object";
+import { classNameBindings } from "@ember-decorators/component";
+import SelectKitRowComponent from "discourse/select-kit/components/select-kit/select-kit-row";
 
-export default SelectKitRowComponent.extend({
-  classNameBindings: ["isDisabled:disabled"],
-
-  @discourseComputed("item")
-  isDisabled() {
+@classNameBindings("isDisabled:disabled")
+export default class WizardSubscriptionSelectorRow extends SelectKitRowComponent {
+  @computed("item")
+  get isDisabled() {
     return this.item.disabled;
-  },
+  }
 
   click(event) {
     event.preventDefault();
@@ -17,5 +16,5 @@ export default SelectKitRowComponent.extend({
       this.selectKit.select(this.rowValue, this.item);
     }
     return false;
-  },
-});
+  }
+}

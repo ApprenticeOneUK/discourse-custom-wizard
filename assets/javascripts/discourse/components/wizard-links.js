@@ -1,9 +1,9 @@
-/* eslint-disable discourse/deprecated-imports, discourse/discourse-common-imports, ember/no-actions-hash, ember/no-classic-classes, ember/no-classic-components, ember/require-tagless-components */
+/* eslint-disable ember/no-actions-hash, ember/no-classic-classes, ember/no-classic-components, ember/require-tagless-components */
+// eslint-disable-next-line discourse/deprecated-imports -- preserve observable arrays used by this legacy component
 import { A } from "@ember/array";
 import Component from "@ember/component";
-import EmberObject from "@ember/object";
+import EmberObject, { computed } from "@ember/object";
 import { notEmpty } from "@ember/object/computed";
-import discourseComputed from "discourse-common/utils/decorators";
 import { generateName } from "../lib/wizard";
 import {
   default as wizardSchema,
@@ -23,54 +23,58 @@ export default Component.extend({
     items.insertAt(newIndex, item);
   },
 
-  @discourseComputed("itemType")
-  header: (itemType) => `admin.wizard.${itemType}.header`,
+  header: computed("itemType", function () {
+    return `admin.wizard.${this.itemType}.header`;
+  }),
 
-  @discourseComputed(
+  links: computed(
     "current",
     "items.@each.id",
     "items.@each.type",
     "items.@each.label",
-    "items.@each.title"
-  )
-  links(current, items) {
-    if (!items) {
-      return;
-    }
+    "items.@each.title",
+    function () {
+      const current = this.current;
+      const items = this.items;
 
-    return items.map((item, index) => {
-      if (item) {
-        let link = {
-          id: item.id,
-        };
-
-        let label = item.label || item.title || item.id;
-        if (this.generateLabels && item.type) {
-          label = generateName(item.type);
-        }
-
-        link.label = `${label} (${item.id})`;
-
-        let classes = "btn";
-        if (current && item.id === current.id) {
-          classes += " btn-primary";
-        }
-
-        link.classes = classes;
-        link.index = index;
-
-        if (index === 0) {
-          link.first = true;
-        }
-
-        if (index === items.length - 1) {
-          link.last = true;
-        }
-
-        return link;
+      if (!items) {
+        return;
       }
-    });
-  },
+
+      return items.map((item, index) => {
+        if (item) {
+          const link = {
+            id: item.id,
+          };
+
+          let label = item.label || item.title || item.id;
+          if (this.generateLabels && item.type) {
+            label = generateName(item.type);
+          }
+
+          link.label = `${label} (${item.id})`;
+
+          let classes = "btn";
+          if (current && item.id === current.id) {
+            classes += " btn-primary";
+          }
+
+          link.classes = classes;
+          link.index = index;
+
+          if (index === 0) {
+            link.first = true;
+          }
+
+          if (index === items.length - 1) {
+            link.last = true;
+          }
+
+          return link;
+        }
+      });
+    }
+  ),
 
   getNextIndex() {
     const items = this.items;
@@ -78,7 +82,7 @@ export default Component.extend({
       return 0;
     }
     const numbers = items
-      .map((i) => Number(i.id.split("_").pop()))
+      .map((item) => Number(item.id.split("_").pop()))
       .sort((a, b) => a - b);
     return numbers[numbers.length - 1];
   },
@@ -87,7 +91,7 @@ export default Component.extend({
     add() {
       const items = this.get("items");
       const itemType = this.itemType;
-      let params = setWizardDefaults({}, itemType);
+      const params = setWizardDefaults({}, itemType);
 
       params.isNew = true;
       params.index = this.getNextIndex();
@@ -99,7 +103,7 @@ export default Component.extend({
 
       params.id = id;
 
-      let objectArrays = wizardSchema[itemType].objectArrays;
+      const objectArrays = wizardSchema[itemType].objectArrays;
       if (objectArrays) {
         Object.keys(objectArrays).forEach((objectType) => {
           params[objectArrays[objectType].property] = A();
@@ -129,10 +133,10 @@ export default Component.extend({
       let item;
       let index;
 
-      items.forEach((it, ind) => {
-        if (it.id === itemId) {
-          item = it;
-          index = ind;
+      items.forEach((candidate, candidateIndex) => {
+        if (candidate.id === itemId) {
+          item = candidate;
+          index = candidateIndex;
         }
       });
 

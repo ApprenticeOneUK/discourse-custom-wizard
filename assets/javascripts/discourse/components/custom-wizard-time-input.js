@@ -1,4 +1,3 @@
-/* eslint-disable discourse/ui-kit-imports */
-import TimeInput from "discourse/components/time-input";
+import DTimeInput from "discourse/ui-kit/d-time-input";
 
-export default TimeInput.extend({});
+export default DTimeInput.extend({});

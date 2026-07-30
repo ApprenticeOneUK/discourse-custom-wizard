@@ -1,5 +1,4 @@
-/* eslint-disable discourse/deprecated-imports */
-import { htmlSafe } from "@ember/template";
+import { trustHTML } from "@ember/template";
 import { i18n } from "discourse-i18n";
 
 export default function wizardCharCounter(body, maxLength) {
@@ -18,5 +17,5 @@ export default function wizardCharCounter(body, maxLength) {
     })}</div>`;
   }
 
-  return htmlSafe(finalString);
+  return trustHTML(finalString);
 }

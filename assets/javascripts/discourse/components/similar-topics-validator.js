@@ -1,101 +1,122 @@
-/* eslint-disable discourse/deprecated-imports, discourse/discourse-common-imports, discourse/ui-kit-imports, ember/no-actions-hash */
-import { A } from "@ember/array";
-import EmberObject, { computed } from "@ember/object";
-import { and, equal, notEmpty } from "@ember/object/computed";
+import EmberObject, { action, computed } from "@ember/object";
 import { cancel, later } from "@ember/runloop";
 import { dasherize } from "@ember/string";
-import { categoryBadgeHTML } from "discourse/helpers/category-link";
-import { deepMerge } from "discourse-common/lib/object";
-import discourseComputed, { observes } from "discourse-common/utils/decorators";
+import { classNames } from "@ember-decorators/component";
+import { observes } from "discourse/lib/decorators";
+import { deepMerge } from "discourse/lib/object";
+import { categoryBadgeHTML } from "discourse/ui-kit/helpers/d-category-link";
 import WizardFieldValidator from "discourse/plugins/discourse-custom-wizard/discourse/components/validator";
 
-export default WizardFieldValidator.extend({
-  classNames: ["similar-topics-validator"],
-  similarTopics: null,
-  hasInput: notEmpty("field.value"),
-  hasSimilarTopics: notEmpty("similarTopics"),
-  hasNotSearched: equal("similarTopics", null),
-  noSimilarTopics: computed("similarTopics", function () {
-    return this.similarTopics !== null && this.similarTopics.length === 0;
-  }),
-  showSimilarTopics: computed("typing", "hasSimilarTopics", function () {
-    return this.hasSimilarTopics && !this.typing;
-  }),
-  showNoSimilarTopics: computed("typing", "noSimilarTopics", function () {
-    return this.noSimilarTopics && !this.typing;
-  }),
-  hasValidationCategories: notEmpty("validationCategories"),
-  insufficientCharacters: computed("typing", "field.value", function () {
-    return this.hasInput && this.field.value.length < 5 && !this.typing;
-  }),
-  insufficientCharactersCategories: and(
-    "insufficientCharacters",
-    "hasValidationCategories"
-  ),
+@classNames("similar-topics-validator")
+export default class SimilarTopicsValidator extends WizardFieldValidator {
+  similarTopics = null;
 
-  @discourseComputed("validation.categories")
-  validationCategories(categoryIds) {
-    if (categoryIds) {
-      return categoryIds.map((id) => this.site.categoriesById[id]);
+  @computed("field.value")
+  get hasInput() {
+    return Boolean(this.field.value);
+  }
+
+  @computed("similarTopics.[]")
+  get hasSimilarTopics() {
+    return Boolean(this.similarTopics?.length);
+  }
+
+  @computed("similarTopics")
+  get hasNotSearched() {
+    return this.similarTopics === null;
+  }
+
+  @computed("similarTopics.[]")
+  get noSimilarTopics() {
+    return this.similarTopics !== null && this.similarTopics.length === 0;
+  }
+
+  @computed("typing", "hasSimilarTopics")
+  get showSimilarTopics() {
+    return this.hasSimilarTopics && !this.typing;
+  }
+
+  @computed("typing", "noSimilarTopics")
+  get showNoSimilarTopics() {
+    return this.noSimilarTopics && !this.typing;
+  }
+
+  @computed("validationCategories.[]")
+  get hasValidationCategories() {
+    return Boolean(this.validationCategories.length);
+  }
+
+  @computed("typing", "field.value")
+  get insufficientCharacters() {
+    return this.hasInput && this.field.value.length < 5 && !this.typing;
+  }
+
+  @computed("insufficientCharacters", "hasValidationCategories")
+  get insufficientCharactersCategories() {
+    return this.insufficientCharacters && this.hasValidationCategories;
+  }
+
+  @computed("validation.categories")
+  get validationCategories() {
+    if (this.validation.categories) {
+      return this.validation.categories.map(
+        (id) => this.site.categoriesById[id]
+      );
     }
 
-    return A();
-  },
+    return [];
+  }
 
-  @discourseComputed("validationCategories")
-  catLinks(categories) {
-    return categories.map((category) => categoryBadgeHTML(category)).join("");
-  },
+  @computed("validationCategories.[]")
+  get catLinks() {
+    return this.validationCategories
+      .map((category) => categoryBadgeHTML(category))
+      .join("");
+  }
 
-  @discourseComputed(
+  @computed(
     "loading",
     "showSimilarTopics",
     "showNoSimilarTopics",
     "insufficientCharacters",
     "insufficientCharactersCategories"
   )
-  currentState(
-    loading,
-    showSimilarTopics,
-    showNoSimilarTopics,
-    insufficientCharacters,
-    insufficientCharactersCategories
-  ) {
+  get currentState() {
     switch (true) {
-      case loading:
+      case this.loading:
         return "loading";
-      case showSimilarTopics:
+      case this.showSimilarTopics:
         return "results";
-      case showNoSimilarTopics:
+      case this.showNoSimilarTopics:
         return "no_results";
-      case insufficientCharactersCategories:
+      case this.insufficientCharactersCategories:
         return "insufficient_characters_categories";
-      case insufficientCharacters:
+      case this.insufficientCharacters:
         return "insufficient_characters";
       default:
         return false;
     }
-  },
+  }
 
-  @discourseComputed("currentState")
-  currentStateClass(currentState) {
-    if (currentState) {
-      return `similar-topics-${dasherize(currentState)}`;
+  @computed("currentState")
+  get currentStateClass() {
+    if (this.currentState) {
+      return `similar-topics-${dasherize(this.currentState)}`;
     }
 
     return "similar-topics";
-  },
+  }
 
-  @discourseComputed("currentState")
-  currentStateKey(currentState) {
-    if (currentState) {
-      return `realtime_validations.similar_topics.${currentState}`;
+  @computed("currentState")
+  get currentStateKey() {
+    if (this.currentState) {
+      return `realtime_validations.similar_topics.${this.currentState}`;
     }
 
     return false;
-  },
+  }
 
-  validate() {},
+  validate() {}
 
   @observes("field.value")
   customValidate() {
@@ -128,7 +149,7 @@ export default WizardFieldValidator.extend({
 
       this.updateSimilarTopics();
     }, 1000);
-  },
+  }
 
   updateSimilarTopics() {
     this.set("similarTopics", null);
@@ -141,21 +162,18 @@ export default WizardFieldValidator.extend({
       time_n_value: this.get("validation.time_n_value"),
     })
       .then((result) => {
-        const similarTopics = A(
-          deepMerge(result["topics"], result["similar_topics"])
-        );
-        similarTopics.forEach(function (topic, index) {
-          similarTopics[index] = EmberObject.create(topic);
-        });
+        const similarTopics = deepMerge(
+          result.topics,
+          result.similar_topics
+        ).map((topic) => EmberObject.create(topic));
 
         this.set("similarTopics", similarTopics);
       })
       .finally(() => this.set("updating", false));
-  },
+  }
 
-  actions: {
-    closeMessage() {
-      this.set("showMessage", false);
-    },
-  },
-});
+  @action
+  closeMessage() {
+    this.set("showMessage", false);
+  }
+}

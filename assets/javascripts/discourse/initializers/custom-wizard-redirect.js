@@ -1,4 +1,3 @@
-/* eslint-disable discourse/plugin-api-no-version */
 import { dasherize } from "@ember/string";
 import { withPluginApi } from "discourse/lib/plugin-api";
 import DiscourseURL from "discourse/lib/url";
@@ -20,7 +19,7 @@ export default {
       window.location.href = wizardUrl;
     });
 
-    withPluginApi("0.8.36", (api) => {
+    withPluginApi((api) => {
       api.onAppEvent("page:changed", (data) => {
         const currentUser = api.getCurrentUser();
 

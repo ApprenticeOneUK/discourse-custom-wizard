@@ -1,8 +1,8 @@
-/* eslint-disable discourse/discourse-common-imports, discourse/i18n-import-location, ember/no-classic-classes, ember/no-classic-components, ember/require-tagless-components, simple-import-sort/imports */
+/* eslint-disable ember/no-classic-classes, ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
 import { not, notEmpty } from "@ember/object/computed";
-import { default as discourseComputed } from "discourse-common/utils/decorators";
-import I18n from "I18n";
+import { default as discourseComputed } from "discourse/lib/decorators";
+import { i18n } from "discourse-i18n";
 
 const icons = {
   error: "circle-xmark",
@@ -24,11 +24,11 @@ export default Component.extend({
 
   @discourseComputed("key", "component", "opts")
   message(key, component, opts) {
-    return I18n.t(`admin.wizard.message.${component}.${key}`, opts || {});
+    return i18n(`admin.wizard.message.${component}.${key}`, opts || {});
   },
 
   @discourseComputed("component")
   documentation(component) {
-    return I18n.t(`admin.wizard.message.${component}.documentation`);
+    return i18n(`admin.wizard.message.${component}.documentation`);
   },
 });

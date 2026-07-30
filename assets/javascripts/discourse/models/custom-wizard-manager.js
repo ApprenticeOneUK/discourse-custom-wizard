@@ -1,8 +1,8 @@
-/* eslint-disable discourse/discourse-common-imports, ember/no-classic-classes */
+/* eslint-disable ember/no-classic-classes */
 import EmberObject from "@ember/object";
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
-import getURL from "discourse-common/lib/get-url";
+import getURL from "discourse/lib/get-url";
 
 const CustomWizardManager = EmberObject.extend();
 

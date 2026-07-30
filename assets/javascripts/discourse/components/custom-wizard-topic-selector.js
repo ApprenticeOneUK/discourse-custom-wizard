@@ -1,24 +1,25 @@
-/* eslint-disable discourse/discourse-common-imports, discourse/moved-packages-import-paths, ember/avoid-leaking-state-in-ember-objects, ember/no-actions-hash, simple-import-sort/imports */
+import { action } from "@ember/object";
 import { isEmpty } from "@ember/utils";
+import { classNames } from "@ember-decorators/component";
+import { makeArray } from "discourse/lib/helpers";
 import { searchForTerm } from "discourse/lib/search";
-import { makeArray } from "discourse-common/lib/helpers";
-import MultiSelectComponent from "select-kit/components/multi-select";
+import MultiSelectComponent from "discourse/select-kit/components/multi-select";
+import { selectKitOptions } from "discourse/select-kit/components/select-kit";
 
-export default MultiSelectComponent.extend({
-  classNames: ["topic-selector", "wizard-topic-selector"],
-  topics: null,
-  value: [],
-  content: [],
-  nameProperty: "fancy_title",
-  labelProperty: "title",
-  titleProperty: "title",
-
-  selectKitOptions: {
-    clearable: true,
-    filterable: true,
-    filterPlaceholder: "choose_topic.title.placeholder",
-    allowAny: false,
-  },
+@classNames("topic-selector", "wizard-topic-selector")
+@selectKitOptions({
+  clearable: true,
+  filterable: true,
+  filterPlaceholder: "choose_topic.title.placeholder",
+  allowAny: false,
+})
+export default class CustomWizardTopicSelector extends MultiSelectComponent {
+  topics = null;
+  value = [];
+  content = [];
+  nameProperty = "fancy_title";
+  labelProperty = "title";
+  titleProperty = "title";
 
   didReceiveAttrs() {
     if (this.topics && !this.selectKit.hasSelection) {
@@ -26,12 +27,12 @@ export default MultiSelectComponent.extend({
       const content = makeArray(this.topics);
       this.selectKit.change(values, content);
     }
-    this._super(...arguments);
-  },
+    super.didReceiveAttrs(...arguments);
+  }
 
   modifyComponentForRow() {
     return "topic-row";
-  },
+  }
 
   search(filter) {
     if (isEmpty(filter)) {
@@ -55,24 +56,23 @@ export default MultiSelectComponent.extend({
         return results.posts.mapBy("topic");
       }
     });
-  },
+  }
 
-  actions: {
-    onChange(value, items) {
-      const content = items.map((t) => {
-        let attrs = {
-          id: t.id,
-          title: t.title,
-          fancy_title: t.fancy_title,
-          url: t.url,
-        };
-        if (t.featured_link) {
-          attrs.featured_link = t.featured_link;
-        }
-        return attrs;
-      });
-      this.setProperties({ value, content });
-      this.onChange(value, content);
-    },
-  },
-});
+  @action
+  onChange(value, items) {
+    const content = items.map((topic) => {
+      const attrs = {
+        id: topic.id,
+        title: topic.title,
+        fancy_title: topic.fancy_title,
+        url: topic.url,
+      };
+      if (topic.featured_link) {
+        attrs.featured_link = topic.featured_link;
+      }
+      return attrs;
+    });
+    this.setProperties({ value, content });
+    this.onChangeCallback(value, content);
+  }
+}

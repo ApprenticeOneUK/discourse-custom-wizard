@@ -1,5 +1,4 @@
-/* eslint-disable discourse/deprecated-imports, ember/no-actions-hash */
-import { A } from "@ember/array";
+/* eslint-disable ember/no-actions-hash */
 import EmberObject, { set } from "@ember/object";
 import { service } from "@ember/service";
 import { all } from "rsvp";
@@ -75,7 +74,9 @@ export default DiscourseRoute.extend({
     controller.setProperties({
       wizardList: model.wizard_list,
       wizardId: this.currentWizard(),
-      custom_fields: A(model.custom_fields.map((f) => EmberObject.create(f))),
+      custom_fields: model.custom_fields.map((field) =>
+        EmberObject.create(field)
+      ),
     });
   },
 

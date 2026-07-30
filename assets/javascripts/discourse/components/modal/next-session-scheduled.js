@@ -1,12 +1,11 @@
-/* eslint-disable discourse/i18n-import-location */
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { action } from "@ember/object";
-import I18n from "I18n";
+import { i18n } from "discourse-i18n";
 
 export default class NextSessionScheduledComponent extends Component {
   @tracked bufferedDateTime;
-  title = I18n.t("admin.wizard.after_time_modal.title");
+  title = i18n("admin.wizard.after_time_modal.title");
 
   constructor() {
     super(...arguments);

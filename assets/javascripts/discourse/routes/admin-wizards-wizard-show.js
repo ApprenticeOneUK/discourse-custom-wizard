@@ -1,8 +1,7 @@
-/* eslint-disable discourse/i18n-import-location, simple-import-sort/imports */
 import { service } from "@ember/service";
 import { ajax } from "discourse/lib/ajax";
 import DiscourseRoute from "discourse/routes/discourse";
-import I18n from "I18n";
+import { i18n } from "discourse-i18n";
 import CustomWizardAdmin from "../models/custom-wizard-admin";
 
 export default DiscourseRoute.extend({
@@ -30,7 +29,7 @@ export default DiscourseRoute.extend({
     const fieldTypes = Object.keys(parentModel.field_types).map((type) => {
       return {
         id: type,
-        name: I18n.t(`admin.wizard.field.type.${type}`),
+        name: i18n(`admin.wizard.field.type.${type}`),
       };
     });
 

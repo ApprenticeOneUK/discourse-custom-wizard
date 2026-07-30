@@ -1,4 +1,4 @@
-/* eslint-disable discourse/deprecated-imports */
+// eslint-disable-next-line discourse/deprecated-imports -- preserve observable arrays used by legacy wizard components
 import { A } from "@ember/array";
 import EmberObject from "@ember/object";
 import { camelCase, listProperties } from "../lib/wizard";
@@ -32,7 +32,7 @@ function buildMappedProperty(value) {
 
     Object.keys(inputJson).forEach((inputKey) => {
       if (inputKey === "pairs") {
-        let pairs = [];
+        const pairs = [];
         let pairCount = inputJson.pairs.length;
 
         inputJson.pairs.forEach((pairJson) => {
@@ -93,7 +93,7 @@ function buildObject(json, type, objectIndex) {
 }
 
 function buildObjectArray(json, type) {
-  let array = A();
+  const array = A();
 
   if (present(json)) {
     json.forEach((objJson, objectIndex) => {

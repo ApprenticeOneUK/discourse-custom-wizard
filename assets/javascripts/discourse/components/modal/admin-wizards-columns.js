@@ -1,10 +1,9 @@
-/* eslint-disable discourse/i18n-import-location */
 import Component from "@glimmer/component";
 import { action } from "@ember/object";
-import I18n from "I18n";
+import { i18n } from "discourse-i18n";
 
 export default class AdminWizardsColumnComponent extends Component {
-  title = I18n.t("admin.wizard.edit_columns");
+  title = i18n("admin.wizard.edit_columns");
 
   @action
   save() {

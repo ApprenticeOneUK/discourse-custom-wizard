@@ -1,7 +1,7 @@
-/* eslint-disable discourse/discourse-common-imports, ember/no-classic-classes */
+/* eslint-disable ember/no-classic-classes */
 import Controller from "@ember/controller";
 import { equal } from "@ember/object/computed";
-import { default as discourseComputed } from "discourse-common/utils/decorators";
+import { default as discourseComputed } from "discourse/lib/decorators";
 
 export default Controller.extend({
   creating: equal("wizardId", "create"),

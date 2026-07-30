@@ -1,7 +1,5 @@
-/* eslint-disable discourse/discourse-common-imports, ember/no-classic-classes */
 import Controller from "@ember/controller";
-import { or } from "@ember/object/computed";
-import discourseComputed from "discourse-common/utils/decorators";
+import { computed } from "@ember/object";
 
 const reasons = {
   noWizard: "none",
@@ -10,16 +8,22 @@ const reasons = {
   completed: "completed",
 };
 
-export default Controller.extend({
-  noAccess: or("noWizard", "requiresLogin", "notPermitted", "completed"),
+export default class CustomWizardIndex extends Controller {
+  @computed("noWizard", "requiresLogin", "notPermitted", "completed")
+  get noAccess() {
+    return (
+      this.noWizard || this.requiresLogin || this.notPermitted || this.completed
+    );
+  }
 
-  @discourseComputed("noAccessReason")
-  noAccessI18nKey(reason) {
-    return reason ? `wizard.${reasons[reason]}` : "wizard.none";
-  },
+  @computed("noAccessReason")
+  get noAccessI18nKey() {
+    return this.noAccessReason
+      ? `wizard.${reasons[this.noAccessReason]}`
+      : "wizard.none";
+  }
 
-  @discourseComputed
-  noAccessReason() {
+  get noAccessReason() {
     return Object.keys(reasons).find((reason) => this.get(reason));
-  },
-});
+  }
+}

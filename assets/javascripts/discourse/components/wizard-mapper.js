@@ -1,90 +1,92 @@
-/* eslint-disable discourse/deprecated-imports, discourse/discourse-common-imports, ember/no-actions-hash, ember/no-classic-classes, ember/no-classic-components, ember/require-tagless-components */
-import { A } from "@ember/array";
+/* eslint-disable ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
+import { action, computed } from "@ember/object";
+import { trackedArray } from "@ember/reactive/collections";
 import { later } from "@ember/runloop";
-import discourseComputed from "discourse-common/utils/decorators";
+import { classNames } from "@ember-decorators/component";
 import { newInput, selectionTypes } from "../lib/wizard-mapper";
 
-export default Component.extend({
-  classNames: "wizard-mapper",
-
+@classNames("wizard-mapper")
+export default class WizardMapper extends Component {
   didReceiveAttrs() {
-    this._super();
+    super.didReceiveAttrs(...arguments);
     if (this.inputs && this.inputs.constructor !== Array) {
       later(() => this.set("inputs", null));
     }
-  },
+  }
 
-  @discourseComputed("inputs.@each.type")
-  canAdd(inputs) {
+  @computed("inputs.@each.type")
+  get canAdd() {
     return (
-      !inputs ||
-      inputs.constructor !== Array ||
-      inputs.every((i) => {
-        return ["assignment", "association"].indexOf(i.type) === -1;
+      !this.inputs ||
+      this.inputs.constructor !== Array ||
+      this.inputs.every((input) => {
+        return !["assignment", "association"].includes(input.type);
       })
     );
-  },
+  }
 
-  @discourseComputed("options.@each.inputType")
-  inputOptions(options) {
-    let result = {
-      inputTypes: options.inputTypes || "assignment,conditional",
-      inputConnector: options.inputConnector || "or",
-      pairConnector: options.pairConnector || null,
-      outputConnector: options.outputConnector || null,
-      context: options.context || null,
-      guestGroup: options.guestGroup || false,
-      includeMessageableGroups: options.includeMessageableGroups || false,
-      userLimit: options.userLimit || null,
+  @computed("options")
+  get inputOptions() {
+    const result = {
+      inputTypes: this.options.inputTypes || "assignment,conditional",
+      inputConnector: this.options.inputConnector || "or",
+      pairConnector: this.options.pairConnector || null,
+      outputConnector: this.options.outputConnector || null,
+      context: this.options.context || null,
+      guestGroup: this.options.guestGroup || false,
+      includeMessageableGroups: this.options.includeMessageableGroups || false,
+      userLimit: this.options.userLimit || null,
     };
 
-    let inputTypes = ["key", "value", "output"];
+    const inputTypes = ["key", "value", "output"];
     inputTypes.forEach((type) => {
-      result[`${type}Placeholder`] = options[`${type}Placeholder`] || null;
+      result[`${type}Placeholder`] = this.options[`${type}Placeholder`] || null;
       result[`${type}DefaultSelection`] =
-        options[`${type}DefaultSelection`] || null;
+        this.options[`${type}DefaultSelection`] || null;
     });
 
     selectionTypes.forEach((type) => {
-      if (options[`${type}Selection`] !== undefined) {
-        result[`${type}Selection`] = options[`${type}Selection`];
+      if (this.options[`${type}Selection`] !== undefined) {
+        result[`${type}Selection`] = this.options[`${type}Selection`];
       } else {
-        result[`${type}Selection`] = type === "text" ? true : false;
+        result[`${type}Selection`] = type === "text";
       }
     });
 
     return result;
-  },
+  }
 
-  onUpdate() {},
+  onUpdate() {}
 
-  actions: {
-    add() {
-      if (!this.get("inputs")) {
-        this.set("inputs", A());
-      }
+  @action
+  add() {
+    if (!this.inputs) {
+      this.set("inputs", trackedArray());
+    }
 
-      this.get("inputs").pushObject(
-        newInput(this.inputOptions, this.inputs.length)
-      );
+    this.inputs.push(newInput(this.inputOptions, this.inputs.length));
 
-      this.onUpdate(this.property, "input");
-    },
+    this.onUpdate(this.property, "input");
+  }
 
-    remove(input) {
-      const inputs = this.inputs;
-      inputs.removeObject(input);
+  @action
+  remove(input) {
+    const inputs = this.inputs;
+    const index = inputs.indexOf(input);
+    if (index !== -1) {
+      inputs.splice(index, 1);
+    }
 
-      if (inputs.length) {
-        inputs[0].set("connector", null);
-      }
+    if (inputs.length) {
+      inputs[0].set("connector", null);
+    }
 
-      this.onUpdate(this.property, "input");
-    },
+    this.onUpdate(this.property, "input");
+  }
 
-    inputUpdated(component, type) {
-      this.onUpdate(this.property, component, type);
-    },
-  },
-});
+  @action
+  inputUpdated(component, type) {
+    this.onUpdate(this.property, component, type);
+  }
+}

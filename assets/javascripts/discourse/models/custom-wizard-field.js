@@ -1,6 +1,5 @@
-/* eslint-disable discourse/discourse-common-imports, ember/no-classic-classes, ember/no-mixins */
-import EmberObject from "@ember/object";
-import discourseComputed from "discourse-common/utils/decorators";
+/* eslint-disable ember/no-mixins */
+import EmberObject, { computed } from "@ember/object";
 import { translationOrText } from "discourse/plugins/discourse-custom-wizard/discourse/lib/wizard";
 import ValidState from "discourse/plugins/discourse-custom-wizard/discourse/mixins/valid-state";
 
@@ -22,31 +21,31 @@ const StandardFieldValidation = [
   "date_time",
 ];
 
-export default EmberObject.extend(ValidState, {
-  id: null,
-  type: null,
-  value: null,
-  required: null,
+export default class CustomWizardField extends EmberObject.extend(ValidState) {
+  id = null;
+  type = null;
+  value = null;
+  required = null;
 
-  @discourseComputed("wizardId", "stepId", "id")
-  i18nKey(wizardId, stepId, id) {
-    return `${wizardId}.${stepId}.${id}`;
-  },
+  @computed("wizardId", "stepId", "id")
+  get i18nKey() {
+    return `${this.wizardId}.${this.stepId}.${this.id}`;
+  }
 
-  @discourseComputed("i18nKey", "label")
-  translatedLabel(i18nKey, label) {
-    return translationOrText(`${i18nKey}.label`, label);
-  },
+  @computed("i18nKey", "label")
+  get translatedLabel() {
+    return translationOrText(`${this.i18nKey}.label`, this.label);
+  }
 
-  @discourseComputed("i18nKey", "placeholder")
-  translatedPlaceholder(i18nKey, placeholder) {
-    return translationOrText(`${i18nKey}.placeholder`, placeholder);
-  },
+  @computed("i18nKey", "placeholder")
+  get translatedPlaceholder() {
+    return translationOrText(`${this.i18nKey}.placeholder`, this.placeholder);
+  }
 
-  @discourseComputed("i18nKey", "description")
-  translatedDescription(i18nKey, description) {
-    return translationOrText(`${i18nKey}.description`, description);
-  },
+  @computed("i18nKey", "description")
+  get translatedDescription() {
+    return translationOrText(`${this.i18nKey}.description`, this.description);
+  }
 
   check() {
     if (this.customCheck) {
@@ -76,5 +75,5 @@ export default EmberObject.extend(ValidState, {
     this.setValid(Boolean(valid));
 
     return valid;
-  },
-});
+  }
+}

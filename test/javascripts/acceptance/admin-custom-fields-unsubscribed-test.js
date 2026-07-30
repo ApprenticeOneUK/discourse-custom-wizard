@@ -1,11 +1,9 @@
-/* eslint-disable qunit/no-assert-equal, qunit/no-loose-assertions, qunit/no-ok-equality */
 import { click, fillIn, visit } from "@ember/test-helpers";
 import { test } from "qunit";
 import {
   acceptance,
   query,
   queryAll,
-  visible,
 } from "discourse/tests/helpers/qunit-helpers";
 import selectKit from "discourse/tests/helpers/select-kit-helper";
 import {
@@ -75,14 +73,17 @@ acceptance("Admin | Custom Fields Unsubscribed", function (needs) {
 
   test("Navigate to custom fields tab", async (assert) => {
     await visit("/admin/wizards/custom-fields");
-    assert.ok(query("table"));
-    assert.ok(
-      queryAll("table tbody tr").length === 4,
+    assert.true(Boolean(query("table")));
+    assert.strictEqual(
+      queryAll("table tbody tr").length,
+      4,
       "Display loaded custom fields"
     );
-    assert.ok(
-      query(".message-content").innerText.includes(
-        "View, create, edit and destroy custom fields"
+    assert.true(
+      Boolean(
+        query(".message-content").innerText.includes(
+          "View, create, edit and destroy custom fields"
+        )
       ),
       "it displays wizard message"
     );
@@ -90,17 +91,15 @@ acceptance("Admin | Custom Fields Unsubscribed", function (needs) {
   test("view available custom fields for unsubscribed plan", async (assert) => {
     await visit("/admin/wizards/custom-fields");
     await click(".admin-wizard-controls .btn-icon-text");
-    assert.ok(
-      visible(".wizard-subscription-selector"),
-      "custom field class is present"
-    );
-    assert.ok(
-      visible(".wizard-subscription-selector-header"),
-      "custom field type is present"
-    );
-    assert.ok(visible(".input"), "custom field name is present");
-    assert.ok(visible(".multi-select"), "custom field serializer is present");
-    assert.ok(visible(".actions"), "custom field action buttons are present");
+    assert
+      .dom(".wizard-subscription-selector")
+      .isVisible("custom field class is present");
+    assert
+      .dom(".wizard-subscription-selector-header")
+      .isVisible("custom field type is present");
+    assert.dom(".input").isVisible("custom field name is present");
+    assert.dom(".multi-select").isVisible("custom field serializer is present");
+    assert.dom(".actions").isVisible("custom field action buttons are present");
 
     const dropdown1 = selectKit(
       '.admin-wizard-container details:has(summary[name="Filter by: Select a class"])'
@@ -112,8 +111,16 @@ acceptance("Admin | Custom Fields Unsubscribed", function (needs) {
     let disabledOptions1 = queryAll(
       '.admin-wizard-container details:has(summary[name="Filter by: Select a class"]) ul li.disabled'
     );
-    assert.equal(enabledOptions1.length, 4, "All class options are enabled");
-    assert.equal(disabledOptions1.length, 0, "No class options are disabled");
+    assert.strictEqual(
+      enabledOptions1.length,
+      4,
+      "All class options are enabled"
+    );
+    assert.strictEqual(
+      disabledOptions1.length,
+      0,
+      "No class options are disabled"
+    );
     const dropdown2 = selectKit(
       '.admin-wizard-container details:has(summary[name="Filter by: Select a type"])'
     );
@@ -124,8 +131,16 @@ acceptance("Admin | Custom Fields Unsubscribed", function (needs) {
     let disabledOptions2 = queryAll(
       '.admin-wizard-container details:has(summary[name="Filter by: Select a type"]) ul li.disabled'
     );
-    assert.equal(enabledOptions2.length, 4, "All type options are enabled");
-    assert.equal(disabledOptions2.length, 0, "No type options are disabled");
+    assert.strictEqual(
+      enabledOptions2.length,
+      4,
+      "All type options are enabled"
+    );
+    assert.strictEqual(
+      disabledOptions2.length,
+      0,
+      "No type options are disabled"
+    );
   });
   test("change custom fields for unsubscribed plan", async (assert) => {
     await visit("/admin/wizards/custom-fields");
@@ -143,7 +158,7 @@ acceptance("Admin | Custom Fields Unsubscribed", function (needs) {
     let enabledOptions1 = queryAll(
       ".admin-wizard-container details.multi-select ul li"
     );
-    assert.equal(
+    assert.strictEqual(
       enabledOptions1.length,
       2,
       "There are two enabled options in the serializer dropdown for Topic"
@@ -158,7 +173,7 @@ acceptance("Admin | Custom Fields Unsubscribed", function (needs) {
     let enabledOptions2 = queryAll(
       ".admin-wizard-container details.multi-select ul li"
     );
-    assert.equal(
+    assert.strictEqual(
       enabledOptions2.length,
       1,
       "There is one enabled option in the serializer dropdown for Post"
@@ -167,8 +182,9 @@ acceptance("Admin | Custom Fields Unsubscribed", function (needs) {
 
   test("Create Topic and Post custom fields", async (assert) => {
     await visit("/admin/wizards/custom-fields");
-    assert.ok(
-      queryAll("table tbody tr").length === 4,
+    assert.strictEqual(
+      queryAll("table tbody tr").length,
+      4,
       "Display loaded custom fields"
     );
     await click(".admin-wizard-controls .btn-icon-text");
@@ -187,16 +203,20 @@ acceptance("Admin | Custom Fields Unsubscribed", function (needs) {
     );
 
     await click(".actions .save");
-    assert.ok(
-      query(
-        ".admin-wizard-container tbody tr:first-child td:nth-child(1) label"
-      ).innerText.includes("topic"),
+    assert.true(
+      Boolean(
+        query(
+          ".admin-wizard-container tbody tr:first-child td:nth-child(1) label"
+        ).innerText.includes("topic")
+      ),
       "Topic custom field is displayed"
     );
-    assert.ok(
-      query(
-        ".admin-wizard-container tbody tr:first-child td:nth-child(3) label"
-      ).innerText.includes("topic_custom_field"),
+    assert.true(
+      Boolean(
+        query(
+          ".admin-wizard-container tbody tr:first-child td:nth-child(3) label"
+        ).innerText.includes("topic_custom_field")
+      ),
       "Topic custom field name is displayed"
     );
 
@@ -216,20 +236,25 @@ acceptance("Admin | Custom Fields Unsubscribed", function (needs) {
     );
 
     await click(".actions .save");
-    assert.ok(
-      query(
-        ".admin-wizard-container tbody tr:first-child td:nth-child(1) label"
-      ).innerText.includes("post"),
+    assert.true(
+      Boolean(
+        query(
+          ".admin-wizard-container tbody tr:first-child td:nth-child(1) label"
+        ).innerText.includes("post")
+      ),
       "Post custom field is displayed"
     );
-    assert.ok(
-      query(
-        ".admin-wizard-container tbody tr:first-child td:nth-child(3) label"
-      ).innerText.includes("post_custom_field"),
+    assert.true(
+      Boolean(
+        query(
+          ".admin-wizard-container tbody tr:first-child td:nth-child(3) label"
+        ).innerText.includes("post_custom_field")
+      ),
       "Post custom field name is displayed"
     );
-    assert.ok(
-      queryAll("table tbody tr").length === 6,
+    assert.strictEqual(
+      queryAll("table tbody tr").length,
+      6,
       "Display added custom fields"
     );
   });
@@ -256,41 +281,52 @@ acceptance("Admin | Custom Fields Unsubscribed", function (needs) {
       "Filter by: String"
     );
     await click(".admin-wizard-container tbody tr:first-child .save");
-    assert.ok(
-      query(
-        ".admin-wizard-container tbody tr:first-child td:nth-child(1) label"
-      ).innerText.includes("topic"),
+    assert.true(
+      Boolean(
+        query(
+          ".admin-wizard-container tbody tr:first-child td:nth-child(1) label"
+        ).innerText.includes("topic")
+      ),
       "Topic custom field is displayed"
     );
-    assert.ok(
-      query(
-        ".admin-wizard-container tbody tr:first-child td:nth-child(2) label"
-      ).innerText.includes("boolean"),
+    assert.true(
+      Boolean(
+        query(
+          ".admin-wizard-container tbody tr:first-child td:nth-child(2) label"
+        ).innerText.includes("boolean")
+      ),
       "Updated Type is displayed"
     );
-    assert.ok(
-      query(
-        ".admin-wizard-container tbody tr:first-child td:nth-child(3) label"
-      ).innerText.includes("updated_topic_custom_field"),
+    assert.true(
+      Boolean(
+        query(
+          ".admin-wizard-container tbody tr:first-child td:nth-child(3) label"
+        ).innerText.includes("updated_topic_custom_field")
+      ),
       "Updated Topic custom field name is displayed"
     );
-    assert.ok(
-      query(
-        ".admin-wizard-container tbody tr:first-child td:nth-child(4)"
-      ).innerText.includes("topic_view"),
+    assert.true(
+      Boolean(
+        query(
+          ".admin-wizard-container tbody tr:first-child td:nth-child(4)"
+        ).innerText.includes("topic_view")
+      ),
       "Original Serializer is displayed"
     );
-    assert.ok(
-      query(
-        ".admin-wizard-container tbody tr:first-child td:nth-child(4)"
-      ).innerText.includes("topic_list_item"),
+    assert.true(
+      Boolean(
+        query(
+          ".admin-wizard-container tbody tr:first-child td:nth-child(4)"
+        ).innerText.includes("topic_list_item")
+      ),
       "Updated Serializer is displayed"
     );
   });
   test("Delete Topic custom field", async (assert) => {
     await visit("/admin/wizards/custom-fields");
-    assert.ok(
-      queryAll("table tbody tr").length === 4,
+    assert.strictEqual(
+      queryAll("table tbody tr").length,
+      4,
       "Display loaded custom fields"
     );
     await click(".admin-wizard-controls .btn-icon-text");
@@ -307,14 +343,16 @@ acceptance("Admin | Custom Fields Unsubscribed", function (needs) {
       "Filter by: Select a type"
     );
     await click(".actions .save");
-    assert.ok(
-      queryAll("table tbody tr").length === 5,
+    assert.strictEqual(
+      queryAll("table tbody tr").length,
+      5,
       "Display added custom fields"
     );
     await click(".admin-wizard-container tbody tr:first-child button");
     await click(".actions .destroy");
-    assert.ok(
-      queryAll("table tbody tr").length === 4,
+    assert.strictEqual(
+      queryAll("table tbody tr").length,
+      4,
       "Display custom fields without deleted fields"
     );
   });

@@ -1,34 +1,37 @@
-/* eslint-disable discourse/i18n-import-location, discourse/moved-packages-import-paths, ember/avoid-leaking-state-in-ember-objects */
-import I18n from "I18n";
-import UserChooserComponent from "select-kit/components/user-chooser";
+import { classNameBindings, classNames } from "@ember-decorators/component";
+import {
+  pluginApiIdentifiers,
+  selectKitOptions,
+} from "discourse/select-kit/components/select-kit";
+import UserChooserComponent from "discourse/select-kit/components/user-chooser";
+import { i18n } from "discourse-i18n";
 
 export const WIZARD_USER = "wizard-user";
 
-export default UserChooserComponent.extend({
-  pluginApiIdentifiers: ["wizard-user-chooser"],
-  classNames: ["user-chooser", "wizard-user-chooser"],
-  classNameBindings: ["selectKit.options.fullWidthWrap:full-width-wrap"],
-  valueProperty: "id",
-  nameProperty: "name",
+@pluginApiIdentifiers("wizard-user-chooser")
+@classNames("user-chooser", "wizard-user-chooser")
+@classNameBindings("selectKit.options.fullWidthWrap:full-width-wrap")
+@selectKitOptions({
+  fullWidthWrap: false,
+  autoWrap: false,
+})
+export default class WizardUserChooser extends UserChooserComponent {
+  valueProperty = "id";
+  nameProperty = "name";
 
   modifyComponentForRow() {
     return "wizard-user-chooser/wizard-user-chooser-row";
-  },
+  }
 
   modifyNoSelection() {
     return this.defaultItem(
       WIZARD_USER,
-      I18n.t("admin.wizard.action.poster.wizard_user")
+      i18n("admin.wizard.action.poster.wizard_user")
     );
-  },
-
-  selectKitOptions: {
-    fullWidthWrap: false,
-    autoWrap: false,
-  },
+  }
 
   search() {
-    const superPromise = this._super(...arguments);
+    const superPromise = super.search(...arguments);
     if (!superPromise) {
       return;
     }
@@ -55,5 +58,5 @@ export default UserChooserComponent.extend({
         return { ...item, ...reconstructed };
       });
     });
-  },
-});
+  }
+}

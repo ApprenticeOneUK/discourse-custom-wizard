@@ -1,12 +1,12 @@
-/* eslint-disable discourse/discourse-common-imports, ember/no-actions-hash, ember/no-classic-classes, ember/no-classic-components, ember/require-tagless-components */
+/* eslint-disable ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
-import discourseComputed from "discourse-common/utils/decorators";
+import { action, computed } from "@ember/object";
+import { classNames } from "@ember-decorators/component";
 
-export default Component.extend({
-  classNames: "wizard-custom-step",
-
-  @discourseComputed("step.index")
-  stepConditionOptions(stepIndex) {
+@classNames("wizard-custom-step")
+export default class WizardCustomStep extends Component {
+  @computed("step.index")
+  get stepConditionOptions() {
     const options = {
       inputTypes: "validation",
       context: "step",
@@ -15,27 +15,27 @@ export default Component.extend({
       groupSelection: true,
     };
 
-    if (stepIndex > 0) {
-      options["wizardFieldSelection"] = true;
-      options["wizardActionSelection"] = true;
+    if (this.step.index > 0) {
+      options.wizardFieldSelection = true;
+      options.wizardActionSelection = true;
     }
 
     return options;
-  },
+  }
 
-  actions: {
-    bannerUploadDone(upload) {
-      this.setProperties({
-        "step.banner": upload.url,
-        "step.banner_upload_id": upload.id,
-      });
-    },
+  @action
+  bannerUploadDone(upload) {
+    this.setProperties({
+      "step.banner": upload.url,
+      "step.banner_upload_id": upload.id,
+    });
+  }
 
-    bannerUploadDeleted() {
-      this.setProperties({
-        "step.banner": null,
-        "step.banner_upload_id": null,
-      });
-    },
-  },
-});
+  @action
+  bannerUploadDeleted() {
+    this.setProperties({
+      "step.banner": null,
+      "step.banner_upload_id": null,
+    });
+  }
+}

@@ -1,40 +1,15 @@
-/* eslint-disable discourse/discourse-common-imports, discourse/i18n-import-location, ember/no-actions-hash, ember/no-classic-classes, ember/no-classic-components, ember/require-tagless-components, simple-import-sort/imports */
+/* eslint-disable ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
-import EmberObject from "@ember/object";
+import EmberObject, { action, computed } from "@ember/object";
+import { classNames } from "@ember-decorators/component";
+import { cloneJSON } from "discourse/lib/object";
 import Category from "discourse/models/category";
-import { cloneJSON } from "discourse-common/lib/object";
-import discourseComputed from "discourse-common/utils/decorators";
-import I18n from "I18n";
+import { i18n } from "discourse-i18n";
 
-export default Component.extend({
-  classNames: ["realtime-validations", "setting", "full", "subscription"],
-
-  @discourseComputed
-  timeUnits() {
-    return ["days", "weeks", "months", "years"].map((unit) => {
-      return {
-        id: unit,
-        name: I18n.t(`admin.wizard.field.validations.time_units.${unit}`),
-      };
-    });
-  },
-
-  @discourseComputed("field.validations")
-  validationRows(validations) {
-    if (!validations) {
-      return [];
-    }
-
-    return Object.keys(validations).map((type) => ({
-      type,
-      props: validations[type],
-      isSimilarTopics: type === "similar_topics",
-      isAnswer: type === "answer",
-    }));
-  },
-
+@classNames("realtime-validations", "setting", "full", "subscription")
+export default class WizardRealtimeValidations extends Component {
   init() {
-    this._super(...arguments);
+    super.init(...arguments);
     if (!this.validations) {
       return;
     }
@@ -56,15 +31,37 @@ export default Component.extend({
         Category.findByIds(bufferCategories);
     }
     this.set("validationBuffer", validationBuffer);
-  },
+  }
 
-  actions: {
-    updateValidationCategories(type, validation, categories) {
-      this.set(`validationBuffer.${type}.categories`, categories);
-      this.set(
-        `field.validations.${type}.categories`,
-        categories.map((category) => category.id)
-      );
-    },
-  },
-});
+  get timeUnits() {
+    return ["days", "weeks", "months", "years"].map((unit) => {
+      return {
+        id: unit,
+        name: i18n(`admin.wizard.field.validations.time_units.${unit}`),
+      };
+    });
+  }
+
+  @computed("field.validations")
+  get validationRows() {
+    if (!this.field.validations) {
+      return [];
+    }
+
+    return Object.keys(this.field.validations).map((type) => ({
+      type,
+      props: this.field.validations[type],
+      isSimilarTopics: type === "similar_topics",
+      isAnswer: type === "answer",
+    }));
+  }
+
+  @action
+  updateValidationCategories(type, validation, categories) {
+    this.set(`validationBuffer.${type}.categories`, categories);
+    this.set(
+      `field.validations.${type}.categories`,
+      categories.map((category) => category.id)
+    );
+  }
+}

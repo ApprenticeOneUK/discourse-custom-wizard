@@ -1,20 +1,19 @@
-/* eslint-disable discourse/discourse-common-imports, discourse/i18n-import-location, discourse/ui-kit-imports, simple-import-sort/imports */
-import TextField from "discourse/components/text-field";
+import { computed } from "@ember/object";
+import { attributeBindings } from "@ember-decorators/component";
 import { isLTR, isRTL, siteDir } from "discourse/lib/text-direction";
-import computed from "discourse-common/utils/decorators";
-import I18n from "I18n";
+import DTextField from "discourse/ui-kit/d-text-field";
+import { i18n } from "discourse-i18n";
 
-export default TextField.extend({
-  attributeBindings: [
-    "autocorrect",
-    "autocapitalize",
-    "autofocus",
-    "maxLength",
-    "dir",
-  ],
-
+@attributeBindings(
+  "autocorrect",
+  "autocapitalize",
+  "autofocus",
+  "maxLength",
+  "dir"
+)
+export default class CustomWizardTextField extends DTextField {
   @computed
-  dir() {
+  get dir() {
     if (this.siteSettings.support_mixed_text_direction) {
       let val = this.value;
       if (val) {
@@ -23,7 +22,7 @@ export default TextField.extend({
         return siteDir();
       }
     }
-  },
+  }
 
   keyUp() {
     if (this.siteSettings.support_mixed_text_direction) {
@@ -36,10 +35,10 @@ export default TextField.extend({
         this.set("dir", siteDir());
       }
     }
-  },
+  }
 
   @computed("placeholderKey")
-  placeholder(placeholderKey) {
-    return placeholderKey ? I18n.t(placeholderKey) : "";
-  },
-});
+  get placeholder() {
+    return this.placeholderKey ? i18n(this.placeholderKey) : "";
+  }
+}

@@ -1,42 +1,45 @@
-/* eslint-disable discourse/discourse-common-imports, ember/no-classic-classes, ember/no-classic-components, ember/require-tagless-components */
+/* eslint-disable ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
+import { computed } from "@ember/object";
 import { dasherize } from "@ember/string";
+import { classNameBindings } from "@ember-decorators/component";
 import { cook } from "discourse/lib/text";
-import discourseComputed from "discourse-common/utils/decorators";
 
-export default Component.extend({
-  classNameBindings: [
-    ":wizard-field",
-    "typeClasses",
-    "field.invalid",
-    "field.id",
-  ],
-
+@classNameBindings(":wizard-field", "typeClasses", "field.invalid", "field.id")
+export default class CustomWizardField extends Component {
   didReceiveAttrs() {
-    this._super(...arguments);
+    super.didReceiveAttrs(...arguments);
 
     cook(this.field.translatedDescription).then((cookedDescription) => {
       this.set("cookedDescription", cookedDescription);
     });
-  },
+  }
 
-  @discourseComputed("field.type", "field.id")
-  typeClasses: (type, id) =>
-    `${dasherize(type)}-field ${dasherize(type)}-${dasherize(id)}`,
+  @computed("field.type", "field.id")
+  get typeClasses() {
+    const type = dasherize(this.field.type);
+    return `${type}-field ${type}-${dasherize(this.field.id)}`;
+  }
 
-  @discourseComputed("field.id")
-  fieldClass: (id) => `field-${dasherize(id)} wizard-focusable`,
+  @computed("field.id")
+  get fieldClass() {
+    return `field-${dasherize(this.field.id)} wizard-focusable`;
+  }
 
-  @discourseComputed("field.type", "field.id")
-  inputComponentName(type, id) {
-    if (["text_only"].includes(type)) {
+  @computed("field.type", "field.id")
+  get inputComponentName() {
+    if (this.field.type === "text_only") {
       return false;
     }
-    return dasherize(type === "component" ? id : `custom-wizard-field-${type}`);
-  },
+    return dasherize(
+      this.field.type === "component"
+        ? this.field.id
+        : `custom-wizard-field-${this.field.type}`
+    );
+  }
 
-  @discourseComputed("field.type")
-  textType(fieldType) {
-    return ["text", "textarea"].includes(fieldType);
-  },
-});
+  @computed("field.type")
+  get textType() {
+    return ["text", "textarea"].includes(this.field.type);
+  }
+}

@@ -1,9 +1,9 @@
-/* eslint-disable discourse/i18n-import-location, ember/no-actions-hash, ember/no-classic-classes, ember/no-classic-components, ember/require-tagless-components */
+/* eslint-disable ember/no-actions-hash, ember/no-classic-classes, ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
 import { computed } from "@ember/object";
 import { gt } from "@ember/object/computed";
 import { later } from "@ember/runloop";
-import I18n from "I18n";
+import { i18n } from "discourse-i18n";
 import { defaultConnector } from "../lib/wizard-mapper";
 
 export default Component.extend({
@@ -16,7 +16,7 @@ export default Component.extend({
   connectorLabel: computed(function () {
     let key = this.connector;
     let path = this.inputTypes ? `input.${key}.name` : `connector.${key}`;
-    return I18n.t(`admin.wizard.${path}`);
+    return i18n(`admin.wizard.${path}`);
   }),
 
   didReceiveAttrs() {

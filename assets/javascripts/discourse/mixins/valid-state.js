@@ -1,5 +1,4 @@
-/* eslint-disable discourse/discourse-common-imports */
-import discourseComputed from "discourse-common/utils/decorators";
+import { computed } from "@ember/object";
 
 export const States = {
   UNCHECKED: 0,
@@ -16,14 +15,17 @@ export default {
     this.set("_validState", States.UNCHECKED);
   },
 
-  @discourseComputed("_validState")
-  valid: (state) => state === States.VALID,
+  valid: computed("_validState", function () {
+    return this._validState === States.VALID;
+  }),
 
-  @discourseComputed("_validState")
-  invalid: (state) => state === States.INVALID,
+  invalid: computed("_validState", function () {
+    return this._validState === States.INVALID;
+  }),
 
-  @discourseComputed("_validState")
-  unchecked: (state) => state === States.UNCHECKED,
+  unchecked: computed("_validState", function () {
+    return this._validState === States.UNCHECKED;
+  }),
 
   setValid(valid, description) {
     this.set("_validState", valid ? States.VALID : States.INVALID);

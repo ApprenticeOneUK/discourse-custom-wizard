@@ -1,6 +1,5 @@
-/* eslint-disable discourse/i18n-import-location */
 import EmberObject from "@ember/object";
-import I18n from "I18n";
+import I18n, { i18n } from "discourse-i18n";
 import wizardSchema from "./wizard-schema";
 
 function selectKitContent(content) {
@@ -36,7 +35,7 @@ function camelCase(string) {
 }
 
 function translationOrText(i18nKey, text) {
-  return I18n.findTranslation(i18nKey) ? I18n.t(i18nKey) : text;
+  return I18n.findTranslation(i18nKey) ? i18n(i18nKey) : text;
 }
 
 const userProperties = [

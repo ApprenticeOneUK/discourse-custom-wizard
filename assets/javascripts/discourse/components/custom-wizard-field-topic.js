@@ -1,23 +1,23 @@
-/* eslint-disable ember/avoid-leaking-state-in-ember-objects, ember/no-actions-hash, ember/no-classic-classes, ember/no-classic-components, ember/require-tagless-components */
+/* eslint-disable ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
+import { action } from "@ember/object";
 
-export default Component.extend({
-  topics: [],
+export default class CustomWizardFieldTopic extends Component {
+  topics = [];
 
   didInsertElement() {
-    this._super(...arguments);
+    super.didInsertElement(...arguments);
     const value = this.field.value;
 
     if (value) {
       this.set("topics", value);
     }
-  },
+  }
 
-  actions: {
-    setValue(_, topics) {
-      if (topics.length) {
-        this.set("field.value", topics);
-      }
-    },
-  },
-});
+  @action
+  setValue(_, topics) {
+    if (topics.length) {
+      this.set("field.value", topics);
+    }
+  }
+}

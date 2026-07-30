@@ -1,15 +1,14 @@
-/* eslint-disable discourse/discourse-common-imports, discourse/ui-kit-imports */
-import DateTimeInput from "discourse/components/date-time-input";
-import discourseComputed from "discourse-common/utils/decorators";
+import { computed } from "@ember/object";
+import DDateTimeInput from "discourse/ui-kit/d-date-time-input";
 
-export default DateTimeInput.extend({
-  @discourseComputed("timeFirst", "tabindex")
-  timeTabindex(timeFirst, tabindex) {
-    return timeFirst ? tabindex : tabindex + 1;
-  },
+export default class CustomWizardDateTimeInput extends DDateTimeInput {
+  @computed("timeFirst", "tabindex")
+  get timeTabindex() {
+    return this.timeFirst ? this.tabindex : this.tabindex + 1;
+  }
 
-  @discourseComputed("timeFirst", "tabindex")
-  dateTabindex(timeFirst, tabindex) {
-    return timeFirst ? tabindex + 1 : tabindex;
-  },
-});
+  @computed("timeFirst", "tabindex")
+  get dateTabindex() {
+    return this.timeFirst ? this.tabindex + 1 : this.tabindex;
+  }
+}

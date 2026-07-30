@@ -1,55 +1,37 @@
-/* eslint-disable discourse/discourse-common-imports, ember/no-classic-classes */
-import EmberObject from "@ember/object";
+import EmberObject, { computed } from "@ember/object";
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
+import getUrl from "discourse/lib/get-url";
 import DiscourseURL from "discourse/lib/url";
-import getUrl from "discourse-common/lib/get-url";
-import discourseComputed from "discourse-common/utils/decorators";
 import CustomWizardField from "./custom-wizard-field";
 import CustomWizardStep from "./custom-wizard-step";
 
-const CustomWizard = EmberObject.extend({
-  @discourseComputed("steps.length")
-  totalSteps: (length) => length,
-
-  skip() {
-    if (this.required && !this.completed && this.permitted) {
-      return;
-    }
-    CustomWizard.skip(this.id);
-  },
-
-  restart() {
-    CustomWizard.restart(this.id);
-  },
-});
-
-CustomWizard.reopenClass({
-  skip(wizardId) {
+class CustomWizard extends EmberObject {
+  static skip(wizardId) {
     ajax({ url: `/w/${wizardId}/skip`, type: "PUT" })
       .then((result) => {
         CustomWizard.finished(result);
       })
       .catch(popupAjaxError);
-  },
+  }
 
-  restart(wizardId) {
+  static restart(wizardId) {
     ajax({ url: `/w/${wizardId}/skip`, type: "PUT" })
       .then(() => {
         DiscourseURL.redirectTo(getUrl(`/w/${wizardId}`));
       })
       .catch(popupAjaxError);
-  },
+  }
 
-  finished(result) {
+  static finished(result) {
     let url = "/";
     if (result.redirect_on_complete) {
       url = result.redirect_on_complete;
     }
     DiscourseURL.redirectTo(getUrl(url));
-  },
+  }
 
-  build(wizardJson) {
+  static build(wizardJson) {
     if (!wizardJson) {
       return null;
     }
@@ -88,8 +70,24 @@ CustomWizard.reopenClass({
         });
     }
     return CustomWizard.create(wizardJson);
-  },
-});
+  }
+
+  @computed("steps.length")
+  get totalSteps() {
+    return this.steps.length;
+  }
+
+  skip() {
+    if (this.required && !this.completed && this.permitted) {
+      return;
+    }
+    CustomWizard.skip(this.id);
+  }
+
+  restart() {
+    CustomWizard.restart(this.id);
+  }
+}
 
 export function findCustomWizard(wizardId, params = {}) {
   let url = `/w/${wizardId}.json`;

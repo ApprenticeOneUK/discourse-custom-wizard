@@ -1,11 +1,10 @@
-/* eslint-disable discourse/discourse-common-imports, discourse/i18n-t, ember/no-classic-components, ember/require-tagless-components */
+/* eslint-disable ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
-import { action } from "@ember/object";
+import { action, computed } from "@ember/object";
 import { getOwner } from "@ember/owner";
 import { service } from "@ember/service";
 import UppyUpload from "discourse/lib/uppy/uppy-upload";
-import discourseComputed from "discourse-common/utils/decorators";
-import I18n from "discourse-i18n";
+import { i18n } from "discourse-i18n";
 
 export default class CustomWizardFieldUpload extends Component {
   @service siteSettings;
@@ -44,11 +43,11 @@ export default class CustomWizardFieldUpload extends Component {
     return result;
   }
 
-  @discourseComputed("uppyUpload.uploading", "uppyUpload.uploadProgress")
-  uploadLabel() {
+  @computed("uppyUpload.uploading", "uppyUpload.uploadProgress")
+  get uploadLabel() {
     return this.uppyUpload?.uploading
-      ? `${I18n.t("wizard.uploading")} ${this.uppyUpload.uploadProgress}%`
-      : I18n.t("wizard.upload");
+      ? `${i18n("wizard.uploading")} ${this.uppyUpload.uploadProgress}%`
+      : i18n("wizard.upload");
   }
 
   @action

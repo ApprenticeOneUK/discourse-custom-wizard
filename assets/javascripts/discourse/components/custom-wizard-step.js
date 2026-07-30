@@ -1,13 +1,13 @@
-/* eslint-disable discourse/deprecated-imports, discourse/discourse-common-imports, ember/no-actions-hash, ember/no-classic-classes, ember/no-classic-components, ember/no-jquery, ember/require-tagless-components */
+/* eslint-disable ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
-import { alias, not, or } from "@ember/object/computed";
+import { action, computed } from "@ember/object";
 import { schedule } from "@ember/runloop";
-import { htmlSafe } from "@ember/template";
-import $ from "jquery";
+import { trustHTML } from "@ember/template";
+import { classNameBindings } from "@ember-decorators/component";
+import { observes } from "discourse/lib/decorators";
+import getUrl from "discourse/lib/get-url";
+import discourseLater from "discourse/lib/later";
 import { cook } from "discourse/lib/text";
-import getUrl from "discourse-common/lib/get-url";
-import discourseLater from "discourse-common/lib/later";
-import discourseComputed, { observes } from "discourse-common/utils/decorators";
 import CustomWizard, {
   updateCachedWizard,
 } from "discourse/plugins/discourse-custom-wizard/discourse/models/custom-wizard";
@@ -23,17 +23,17 @@ const uploadEndedEventKeys = [
   "all-uploads-complete",
 ];
 
-export default Component.extend({
-  classNameBindings: [":wizard-step", "step.id"],
-  saving: null,
+@classNameBindings(":wizard-step", "step.id")
+export default class CustomWizardStep extends Component {
+  saving = null;
 
   init() {
-    this._super(...arguments);
+    super.init(...arguments);
     this.set("stylingDropdown", {});
-  },
+  }
 
   didReceiveAttrs() {
-    this._super(...arguments);
+    super.didReceiveAttrs(...arguments);
 
     cook(this.step.translatedTitle).then((cookedTitle) => {
       this.set("cookedTitle", cookedTitle);
@@ -52,71 +52,91 @@ export default Component.extend({
         this.set("uploading", false);
       });
     });
-  },
+  }
 
   didInsertElement() {
-    this._super(...arguments);
+    super.didInsertElement(...arguments);
     this.autoFocus();
-  },
+  }
 
-  @discourseComputed("step.index", "wizard.required")
-  showQuitButton: (index, required) => index === 0 && !required,
+  @computed("step.index", "wizard.required")
+  get showQuitButton() {
+    return this.step.index === 0 && !this.wizard.required;
+  }
 
-  showNextButton: not("step.final"),
-  showDoneButton: alias("step.final"),
-  btnsDisabled: or("saving", "uploading"),
+  @computed("step.final")
+  get showNextButton() {
+    return !this.step.final;
+  }
 
-  @discourseComputed(
+  @computed("step.final")
+  get showDoneButton() {
+    return this.step.final;
+  }
+
+  @computed("saving", "uploading")
+  get btnsDisabled() {
+    return this.saving || this.uploading;
+  }
+
+  @computed(
     "step.index",
     "step.displayIndex",
     "wizard.totalSteps",
     "wizard.completed"
   )
-  showFinishButton: (index, displayIndex, total, completed) => {
-    return index !== 0 && displayIndex !== total && completed;
-  },
+  get showFinishButton() {
+    return (
+      this.step.index !== 0 &&
+      this.step.displayIndex !== this.wizard.totalSteps &&
+      this.wizard.completed
+    );
+  }
 
-  @discourseComputed("step.index")
-  showBackButton: (index) => index > 0,
+  @computed("step.index")
+  get showBackButton() {
+    return this.step.index > 0;
+  }
 
-  @discourseComputed("step.banner")
-  bannerImage(src) {
-    if (!src) {
+  @computed("step.banner")
+  get bannerImage() {
+    if (!this.step.banner) {
       return;
     }
-    return getUrl(src);
-  },
+    return getUrl(this.step.banner);
+  }
 
-  @discourseComputed("step.id")
-  bannerAndDescriptionClass(id) {
-    return `wizard-banner-and-description wizard-banner-and-description-${id}`;
-  },
+  @computed("step.id")
+  get bannerAndDescriptionClass() {
+    return `wizard-banner-and-description wizard-banner-and-description-${this.step.id}`;
+  }
 
-  @discourseComputed("step.fields.[]")
-  primaryButtonIndex(fields) {
-    return fields.length + 1;
-  },
+  @computed("step.fields.[]")
+  get primaryButtonIndex() {
+    return this.step.fields.length + 1;
+  }
 
-  @discourseComputed("step.fields.[]")
-  secondaryButtonIndex(fields) {
-    return fields.length + 2;
-  },
+  @computed("step.fields.[]")
+  get secondaryButtonIndex() {
+    return this.step.fields.length + 2;
+  }
 
   @observes("step.id")
   _stepChanged() {
     this.set("saving", false);
     this.autoFocus();
-  },
+  }
 
   @observes("step.message")
-  _handleMessage: function () {
+  _handleMessage() {
     const message = this.get("step.message");
-    this.showMessage(message);
-  },
+    this.onShowMessage(message);
+  }
 
-  @discourseComputed("step.index", "wizard.totalSteps")
-  barStyle(displayIndex, totalSteps) {
-    let ratio = parseFloat(displayIndex) / parseFloat(totalSteps - 1);
+  @computed("step.index", "wizard.totalSteps")
+  get barStyle() {
+    let ratio =
+      parseFloat(this.step.index) / parseFloat(this.wizard.totalSteps - 1);
     if (ratio < 0) {
       ratio = 0;
     }
@@ -124,37 +144,35 @@ export default Component.extend({
       ratio = 1;
     }
 
-    return htmlSafe(`width: ${ratio * 200}px`);
-  },
+    return trustHTML(`width: ${ratio * 200}px`);
+  }
 
-  @discourseComputed("step.fields")
-  includeSidebar(fields) {
-    return !!fields.findBy("show_in_sidebar");
-  },
+  @computed("step.fields")
+  get includeSidebar() {
+    return this.step.fields.some((field) => field.show_in_sidebar);
+  }
 
   autoFocus() {
     discourseLater(() => {
       schedule("afterRender", () => {
-        if ($(".invalid .wizard-focusable").length) {
+        if (document.querySelector(".invalid .wizard-focusable")) {
           this.animateInvalidFields();
         }
       });
     });
-  },
+  }
 
   animateInvalidFields() {
     schedule("afterRender", () => {
-      let $invalid = $(".invalid .wizard-focusable");
-      if ($invalid.length) {
-        $([document.documentElement, document.body]).animate(
-          {
-            scrollTop: $invalid.offset().top - 200,
-          },
-          400
-        );
+      const invalid = document.querySelector(".invalid .wizard-focusable");
+      if (invalid) {
+        window.scrollTo({
+          top: invalid.getBoundingClientRect().top + window.scrollY - 200,
+          behavior: "smooth",
+        });
       }
     });
-  },
+  }
 
   advance() {
     this.set("saving", true);
@@ -171,61 +189,66 @@ export default Component.extend({
       })
       .catch(() => this.animateInvalidFields())
       .finally(() => this.set("saving", false));
-  },
+  }
 
-  actions: {
-    quit() {
-      this.get("wizard").skip();
-    },
+  @action
+  quit() {
+    this.wizard.skip();
+  }
 
-    done() {
-      this.send("nextStep");
-    },
+  @action
+  done() {
+    this.nextStep();
+  }
 
-    showMessage(message) {
-      this.showMessage(message);
-    },
+  @action
+  showMessage(message) {
+    this.onShowMessage(message);
+  }
 
-    stylingDropdownChanged(id, value) {
-      this.set("stylingDropdown", { id, value });
-    },
+  @action
+  stylingDropdownChanged(id, value) {
+    this.set("stylingDropdown", { id, value });
+  }
 
-    exitEarly() {
-      const step = this.step;
-      step.validate();
+  @action
+  exitEarly() {
+    const step = this.step;
+    step.validate();
 
-      if (step.get("valid")) {
-        this.set("saving", true);
+    if (step.get("valid")) {
+      this.set("saving", true);
 
-        step
-          .save()
-          .then(() => this.send("quit"))
-          .finally(() => this.set("saving", false));
-      } else {
-        this.autoFocus();
-      }
-    },
+      step
+        .save()
+        .then(() => this.quit())
+        .finally(() => this.set("saving", false));
+    } else {
+      this.autoFocus();
+    }
+  }
 
-    backStep() {
-      if (this.saving) {
-        return;
-      }
+  @action
+  backStep() {
+    if (this.saving) {
+      return;
+    }
 
-      this.goBack();
-    },
+    this.goBack();
+  }
 
-    nextStep() {
-      if (this.saving) {
-        return;
-      }
+  @action
+  nextStep() {
+    if (this.saving) {
+      return;
+    }
 
-      this.step.validate();
+    this.step.validate();
 
-      if (this.step.get("valid")) {
-        this.advance();
-      } else {
-        this.autoFocus();
-      }
-    },
-  },
-});
+    if (this.step.get("valid")) {
+      this.advance();
+    } else {
+      this.autoFocus();
+    }
+  }
+}
