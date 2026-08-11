@@ -100,7 +100,7 @@ after_initialize do
 
   # preloaded category custom fields
   %w[create_topic_wizard].each do |custom_field|
-    Site.preloaded_category_custom_fields << custom_field
+    register_preloaded_category_custom_fields(custom_field)
   end
 
   Liquid::Environment.default.register_filter(::CustomWizard::LiquidFilter::FirstNonEmpty)
