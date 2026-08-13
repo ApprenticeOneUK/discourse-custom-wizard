@@ -199,10 +199,12 @@ const WizardMapperSelector = Component.extend({
   didReceiveAttrs() {
     this._super(...arguments);
 
-    if (this._inputType !== this.inputType) {
-      this._inputType = this.inputType;
+    if (this._receivedInputType && this._inputType !== this.inputType) {
       this.resetActiveType();
     }
+
+    this._inputType = this.inputType;
+    this._receivedInputType = true;
   },
 
   willDestroyElement() {
@@ -266,7 +268,11 @@ const WizardMapperSelector = Component.extend({
       }
 
       if (activeType === "wizardField") {
-        content = wizardFields;
+        content = wizardFields.map((f) => ({
+          id: f.id,
+          name: f.label,
+          type: f.type,
+        }));
 
         if (context === "field") {
           content = content.filter((field) => field.id !== currentFieldId);
@@ -276,7 +282,7 @@ const WizardMapperSelector = Component.extend({
       if (activeType === "wizardAction") {
         content = wizardActions.map((a) => ({
           id: a.id,
-          label: `${generateName(a.type)} (${a.id})`,
+          name: `${generateName(a.type)} (${a.id})`,
           type: a.type,
         }));
 
