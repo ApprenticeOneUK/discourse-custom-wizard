@@ -69,15 +69,6 @@ export default class WizardMapperInput extends Component {
     return inputTypesContent(this.options);
   }
 
-  didReceiveAttrs() {
-    super.didReceiveAttrs(...arguments);
-
-    if (this._input !== this.input) {
-      this._input = this.input;
-      this.setupType();
-    }
-  }
-
   setupType() {
     if (this.hasPairs && (!this.input.pairs || this.input.pairs.length < 1)) {
       this.addPair();

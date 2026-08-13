@@ -1,3 +1,4 @@
+import { getOwner } from "@ember/owner";
 import { click, fillIn, triggerKeyEvent, visit } from "@ember/test-helpers";
 import { test } from "qunit";
 import {
@@ -216,7 +217,8 @@ acceptance("Field | Fields", function (needs) {
     await click(".wizard-field.group-field .select-kit-header");
     assert.strictEqual(
       count(".wizard-field.group-field .select-kit-collection li"),
-      10
+      getOwner(this).lookup("service:site").groups.length,
+      "all site groups are listed"
     );
   });
 

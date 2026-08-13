@@ -46,7 +46,7 @@ function buildMappedProperty(value) {
           pairs.push(EmberObject.create(pair));
         });
 
-        input.pairs = pairs;
+        input.pairs = trackedArray(pairs);
       } else {
         input[inputKey] = castCase(inputKey, inputJson[inputKey]);
       }
