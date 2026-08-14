@@ -1,4 +1,5 @@
 import EmberObject from "@ember/object";
+import { makeArray } from "discourse/lib/helpers";
 import I18n, { i18n } from "discourse-i18n";
 import wizardSchema from "./wizard-schema";
 
@@ -65,6 +66,12 @@ const notificationLevels = [
   "muted",
 ];
 
+function tagNames(tags) {
+  return makeArray(tags)
+    .map((tag) => (typeof tag === "string" ? tag : tag?.name))
+    .filter(Boolean);
+}
+
 function listProperties(itemType, opts = {}) {
   let properties = Object.keys(wizardSchema[itemType].basic);
 
@@ -124,6 +131,7 @@ export {
   userProperties,
   listProperties,
   notificationLevels,
+  tagNames,
   wizardFieldList,
   sentenceCase,
   translationOrText,

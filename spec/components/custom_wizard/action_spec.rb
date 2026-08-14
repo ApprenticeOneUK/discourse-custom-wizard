@@ -80,6 +80,35 @@ describe CustomWizard::Action do
       expect(Post.where(topic_id: topic.pluck(:id), raw: "topic body").exists?).to eq(true)
     end
 
+    it "adds tags mapped to tag objects" do
+      wizard_template[:actions][0]["tags"] = [
+        {
+          type: "assignment",
+          output_type: "wizard_field",
+          output_connector: "set",
+          output: "step_3_field_2",
+        },
+      ]
+      wizard_template[:steps][2]["fields"] << { id: "step_3_field_2", type: "tag", label: "Tag" }
+      update_template(wizard_template)
+
+      wizard = CustomWizard::Builder.new(@template[:id], user).build
+      wizard.create_updater(
+        wizard.steps.first.id,
+        step_1_field_1: "Topic Title",
+        step_1_field_2: "topic body",
+      ).update
+      wizard.create_updater(wizard.steps.second.id, {}).update
+      wizard.create_updater(
+        wizard.steps.last.id,
+        step_3_field_3: category.id,
+        step_3_field_2: [{ id: tag.id, name: tag.name }],
+      ).update
+
+      topic = Topic.find_by(title: "Topic Title")
+      expect(topic.tags.pluck(:name)).to eq([tag.name])
+    end
+
     it "fails silently without basic topic inputs" do
       wizard = CustomWizard::Builder.new(@template[:id], user).build
       wizard.create_updater(wizard.steps.first.id, step_1_field_2: "topic body").update
@@ -278,6 +307,45 @@ describe CustomWizard::Action do
       expect(TagUser.where(tag_id: tag.id, user_id: user.id).first.notification_level).to eq(2)
     end
 
+    it "watches tags mapped to tag objects" do
+      watch_tags[:tags][0][:output] = "step_1_field_1"
+      watch_tags[:tags][0][:output_type] = "wizard_field"
+      wizard_template[:actions] << watch_tags
+      update_template(wizard_template)
+
+      wizard = CustomWizard::Builder.new(@template[:id], user).build
+      wizard.create_updater(
+        wizard.steps[0].id,
+        step_1_field_1: [{ id: tag.id, name: tag.name }],
+      ).update
+
+      expect(TagUser.where(tag_id: tag.id, user_id: user.id).first.notification_level).to eq(2)
+    end
+
+    it "watches tags for the users in the action" do
+      user2 = Fabricate(:user, username: "angus2")
+
+      watch_tags[:tags][0][:output] = tag.name
+      watch_tags[:wizard_user] = false
+      watch_tags[:usernames] = [
+        {
+          type: "assignment",
+          output_type: "user",
+          output_connector: "set",
+          output: [user1.username, user2.username],
+        },
+      ]
+      wizard_template[:actions] << watch_tags
+      update_template(wizard_template)
+
+      wizard = CustomWizard::Builder.new(@template[:id], user).build
+      wizard.create_updater(wizard.steps[0].id, step_1_field_1: "Text input").update
+
+      expect(TagUser.where(tag_id: tag.id, notification_level: 2).pluck(:user_id)).to match_array(
+        [user1.id, user2.id],
+      )
+    end
+
     it "watches categories" do
       watch_categories[:categories][0][:output] = category.id
       wizard_template[:actions] << watch_categories
@@ -289,6 +357,30 @@ describe CustomWizard::Action do
       expect(
         CategoryUser.where(category_id: category.id, user_id: user.id).first.notification_level,
       ).to eq(2)
+    end
+
+    it "watches categories for the users in the action" do
+      user2 = Fabricate(:user, username: "angus2")
+
+      watch_categories[:categories][0][:output] = category.id
+      watch_categories[:wizard_user] = false
+      watch_categories[:usernames] = [
+        {
+          type: "assignment",
+          output_type: "user",
+          output_connector: "set",
+          output: [user1.username, user2.username],
+        },
+      ]
+      wizard_template[:actions] << watch_categories
+      update_template(wizard_template)
+
+      wizard = CustomWizard::Builder.new(@template[:id], user).build
+      wizard.create_updater(wizard.steps[0].id, step_1_field_1: "Text input").update
+
+      expect(
+        CategoryUser.where(category_id: category.id, notification_level: 2).pluck(:user_id),
+      ).to match_array([user1.id, user2.id])
     end
 
     it "#send_message" do

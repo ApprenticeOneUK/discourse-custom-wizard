@@ -18,7 +18,6 @@ export default class WizardMapper extends Component {
     }
   }
 
-  @computed("inputs.@each.type")
   get canAdd() {
     return (
       !this.inputs ||

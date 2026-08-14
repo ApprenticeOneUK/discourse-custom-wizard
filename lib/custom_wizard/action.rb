@@ -183,8 +183,7 @@ class CustomWizard::Action
 
   def watch_tags
     tags = CustomWizard::Mapper.new(inputs: action["tags"], data: mapper_data, user: user).perform
-
-    tags = [*tags]
+    tags = tag_names(tags)
     level = action["notification_level"].to_sym
 
     if level.blank?
@@ -192,19 +191,7 @@ class CustomWizard::Action
       return
     end
 
-    users = []
-
-    if action["usernames"]
-      mapped_users =
-        CustomWizard::Mapper.new(inputs: action["usernames"], data: mapper_data, user: user).perform
-
-      if mapped_users.present?
-        mapped_users = mapped_users.split(",").map { |username| User.find_by(username: username) }
-        users.push(*mapped_users)
-      end
-    end
-
-    users.push(user) if ActiveRecord::Type::Boolean.new.cast(action["wizard_user"])
+    users = action_users
 
     users.each do |user|
       result = TagUser.batch_set(user, level, tags)
@@ -237,19 +224,7 @@ class CustomWizard::Action
         user: user,
       ).perform
 
-    users = []
-
-    if action["usernames"]
-      mapped_users =
-        CustomWizard::Mapper.new(inputs: action["usernames"], data: mapper_data, user: user).perform
-
-      if mapped_users.present?
-        mapped_users = mapped_users.split(",").map { |username| User.find_by(username: username) }
-        users.push(*mapped_users)
-      end
-    end
-
-    users.push(user) if ActiveRecord::Type::Boolean.new.cast(action["wizard_user"])
+    users = action_users
 
     category_ids = Category.all.pluck(:id)
     set_level = CategoryUser.notification_levels[notification_level.to_sym]
@@ -474,12 +449,28 @@ class CustomWizard::Action
 
     return false if output.blank?
 
-    if output.is_a?(Array)
-      output.flatten
-    else
-      output.is_a?(String)
-      [*output]
+    tag_names(output).presence || false
+  end
+
+  def tag_names(value)
+    Array.wrap(value).flatten.filter_map { |tag| tag.is_a?(Hash) ? tag["name"] : tag }
+  end
+
+  def action_users
+    users = []
+
+    if action["usernames"].present?
+      output =
+        CustomWizard::Mapper.new(inputs: action["usernames"], data: mapper_data, user: user).perform
+      values = Array.wrap(output).flatten.flat_map { |value| value.to_s.split(",") }
+      usernames = values.filter_map { |value| User.normalize_username(value.strip) }
+
+      users.push(*User.where(username_lower: usernames))
     end
+
+    users.push(user) if ActiveRecord::Type::Boolean.new.cast(action["wizard_user"])
+
+    users.uniq
   end
 
   def add_custom_fields(params = {})
