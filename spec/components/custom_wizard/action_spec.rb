@@ -39,7 +39,8 @@ describe CustomWizard::Action do
   let(:guests_permitted) { get_wizard_fixture("wizard/guests_permitted") }
 
   def update_template(template)
-    CustomWizard::Template.save(template, skip_jobs: true)
+    saved = CustomWizard::Template.new(template)
+    raise saved.errors.full_messages.join(", ") if !saved.save(skip_jobs: true)
     @template = CustomWizard::Template.find("super_mega_fun_wizard")
   end
 
@@ -89,7 +90,7 @@ describe CustomWizard::Action do
           output: "step_3_field_2",
         },
       ]
-      wizard_template[:steps][2]["fields"] << { id: "step_3_field_2", type: "tag", label: "Tag" }
+      wizard_template[:steps][2]["fields"] << { "id" => "step_3_field_2", "type" => "tag" }
       update_template(wizard_template)
 
       wizard = CustomWizard::Builder.new(@template[:id], user).build

@@ -10,7 +10,7 @@ import {
 
 const VISIBLE_ACTION = ".wizard-custom-action.visible";
 const USERNAMES_SETTING = `${VISIBLE_ACTION} .field-mapper-setting:last-child`;
-const [, secondTag] = tagsJson.tags;
+const [firstTag, secondTag] = tagsJson.tags;
 
 function assignment(output, outputType) {
   return [
@@ -68,7 +68,7 @@ const mappedWizard = {
       type: "watch_tags",
       notification_level: "tracking",
       wizard_user: true,
-      tags: assignment(["gazelle"], "tag"),
+      tags: assignment([firstTag.name], "tag"),
       usernames: assignment(["bruce1"], "user"),
     },
     {
@@ -163,6 +163,24 @@ acceptance("Admin | Custom Wizard | Mapped settings", function (needs) {
       savedWizard.actions[0].tags[0].output,
       ["gazelle", secondTag.name],
       "the mapped tags are saved as tag names"
+    );
+  });
+
+  test("does not save a tag twice when it is selected again", async function (assert) {
+    await visit("/admin/wizards/wizard/mapped_wizard");
+    await selectAction("action_2");
+
+    const tags = selectKit(
+      `${VISIBLE_ACTION} .mapper-selector.tag .tag-chooser`
+    );
+    await tags.expand();
+    await tags.selectRowByValue(firstTag.id);
+    await click(".admin-wizard-buttons button");
+
+    assert.deepEqual(
+      savedWizard.actions[1].tags[0].output,
+      [firstTag.name],
+      "the already mapped tag is not duplicated"
     );
   });
 

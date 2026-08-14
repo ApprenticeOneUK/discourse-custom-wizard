@@ -453,7 +453,12 @@ class CustomWizard::Action
   end
 
   def tag_names(value)
-    Array.wrap(value).flatten.filter_map { |tag| tag.is_a?(Hash) ? tag["name"] : tag }
+    tags = Array.wrap(value).flatten
+    tags.filter_map { |tag| tag_object?(tag) ? tag["name"] : tag }
+  end
+
+  def tag_object?(value)
+    value.is_a?(Hash) || value.is_a?(ActionController::Parameters)
   end
 
   def action_users

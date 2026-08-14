@@ -1,4 +1,5 @@
 import EmberObject from "@ember/object";
+import { uniqueItemsFromArray } from "discourse/lib/array-tools";
 import { makeArray } from "discourse/lib/helpers";
 import I18n, { i18n } from "discourse-i18n";
 import wizardSchema from "./wizard-schema";
@@ -67,9 +68,11 @@ const notificationLevels = [
 ];
 
 function tagNames(tags) {
-  return makeArray(tags)
-    .map((tag) => (typeof tag === "string" ? tag : tag?.name))
-    .filter(Boolean);
+  return uniqueItemsFromArray(
+    makeArray(tags)
+      .map((tag) => (typeof tag === "string" ? tag : tag?.name))
+      .filter(Boolean)
+  );
 }
 
 function listProperties(itemType, opts = {}) {
