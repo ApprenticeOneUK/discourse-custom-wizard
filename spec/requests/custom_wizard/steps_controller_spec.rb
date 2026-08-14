@@ -14,6 +14,12 @@ describe CustomWizard::StepsController do
   let(:admin_permitted_json) { get_wizard_fixture("wizard/admin_permitted") }
   let(:route_to_template) { get_wizard_fixture("actions/route_to") }
   let(:guests_permitted) { get_wizard_fixture("wizard/guests_permitted") }
+  let(:watch_tags_template) do
+    template = get_wizard_fixture("actions/watch_tags")
+    template["tags"][0]["output"] = "step_1_field_5"
+    template["tags"][0]["output_type"] = "wizard_field"
+    template
+  end
 
   before { CustomWizard::Template.save(wizard_template, skip_jobs: true) }
 
@@ -160,6 +166,24 @@ describe CustomWizard::StepsController do
       put "/w/super-mega-fun-wizard/steps/step_1.json"
       expect(response.status).to eq(200)
       expect(response.parsed_body["wizard"]["start"]).to eq("step_2")
+    end
+
+    it "handles a tag field submitted as tag objects" do
+      tag = Fabricate(:tag, name: "tag1")
+      new_template = wizard_template.dup
+      new_template["steps"][0]["fields"] << { "id" => "step_1_field_5", "type" => "tag" }
+      new_template["actions"] = [watch_tags_template]
+      CustomWizard::Template.save(new_template, skip_jobs: true)
+
+      put "/w/super-mega-fun-wizard/steps/step_1.json",
+          params: {
+            fields: {
+              step_1_field_5: [{ id: tag.id, name: tag.name }],
+            },
+          }
+
+      expect(response.status).to eq(200)
+      expect(TagUser.where(tag_id: tag.id, user_id: user.id).first.notification_level).to eq(2)
     end
 
     it "returns an updated wizard when condition passes" do

@@ -15,6 +15,7 @@ import {
   generateName,
   sentenceCase,
   snakeCase,
+  tagNames,
   userProperties,
 } from "../lib/wizard";
 import { defaultSelectionType, selectionTypes } from "../lib/wizard-mapper";
@@ -441,6 +442,11 @@ export default class WizardMapperSelectorComponent extends WizardMapperSelector 
   }
 
   @action
+  updateTagValue(items) {
+    this.changeValue(tagNames(items));
+  }
+
+  @action
   changeInputValue(event) {
     this.changeValue(event.target.value);
   }
@@ -510,7 +516,7 @@ export default class WizardMapperSelectorComponent extends WizardMapperSelector 
       {{#if this.showTag}}
         <TagChooser
           @tags={{this.value}}
-          @onChange={{this.updateValue}}
+          @onChange={{this.updateTagValue}}
           @everyTag={{true}}
           @options={{hash none=this.placeholderKey filterable=true}}
         />

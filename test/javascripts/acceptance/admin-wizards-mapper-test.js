@@ -1,10 +1,16 @@
 import { click, visit } from "@ember/test-helpers";
 import { test } from "qunit";
 import { acceptance } from "discourse/tests/helpers/qunit-helpers";
+import selectKit from "discourse/tests/helpers/select-kit-helper";
+import tagsJson from "../fixtures/tags";
 import {
   getUnsubscribedAdminWizards,
   getWizard,
 } from "../helpers/admin-wizard";
+
+const VISIBLE_ACTION = ".wizard-custom-action.visible";
+const USERNAMES_SETTING = `${VISIBLE_ACTION} .field-mapper-setting:last-child`;
+const [firstTag, secondTag] = tagsJson.tags;
 
 function assignment(output, outputType) {
   return [
@@ -56,6 +62,23 @@ const mappedWizard = {
         },
       ],
     },
+    {
+      id: "action_2",
+      run_after: "wizard_completion",
+      type: "watch_tags",
+      notification_level: "tracking",
+      wizard_user: true,
+      tags: assignment([firstTag.name], "tag"),
+      usernames: assignment(["bruce1"], "user"),
+    },
+    {
+      id: "action_3",
+      run_after: "wizard_completion",
+      type: "watch_tags",
+      notification_level: "tracking",
+      wizard_user: true,
+      tags: assignment(["gazelle"], "tag"),
+    },
   ],
 };
 
@@ -84,11 +107,19 @@ acceptance("Admin | Custom Wizard | Mapped settings", function (needs) {
       server.get(url, () => helper.response(response));
     });
 
+    server.get("/tags/filter/search", () =>
+      helper.response({ results: tagsJson.tags })
+    );
+
     server.put("/admin/wizards/wizard/mapped_wizard", (request) => {
       savedWizard = JSON.parse(request.requestBody).wizard;
       return helper.response({ success: "OK", wizard_id: "mapped_wizard" });
     });
   });
+
+  async function selectAction(id) {
+    await click(`.wizard-links.action .link-list [data-id="${id}"] button`);
+  }
 
   test("keeps mapped settings when a wizard is saved without changes", async function (assert) {
     await visit("/admin/wizards/wizard/mapped_wizard");
@@ -107,5 +138,89 @@ acceptance("Admin | Custom Wizard | Mapped settings", function (needs) {
         `the action ${property} is unchanged`
       );
     }
+
+    for (const property of ["tags", "usernames"]) {
+      assert.deepEqual(
+        savedWizard.actions[1][property],
+        mappedWizard.actions[1][property],
+        `the watch tags action ${property} is unchanged`
+      );
+    }
+  });
+
+  test("saves tag names selected in a mapper", async function (assert) {
+    await visit("/admin/wizards/wizard/mapped_wizard");
+    await selectAction("action_1");
+
+    const tags = selectKit(
+      `${VISIBLE_ACTION} .mapper-selector.tag .tag-chooser`
+    );
+    await tags.expand();
+    await tags.selectRowByValue(secondTag.id);
+    await click(".admin-wizard-buttons button");
+
+    assert.deepEqual(
+      savedWizard.actions[0].tags[0].output,
+      ["gazelle", secondTag.name],
+      "the mapped tags are saved as tag names"
+    );
+  });
+
+  test("does not save a tag twice when it is selected again", async function (assert) {
+    await visit("/admin/wizards/wizard/mapped_wizard");
+    await selectAction("action_2");
+
+    const tags = selectKit(
+      `${VISIBLE_ACTION} .mapper-selector.tag .tag-chooser`
+    );
+    await tags.expand();
+    await tags.selectRowByValue(firstTag.id);
+    await click(".admin-wizard-buttons button");
+
+    assert.deepEqual(
+      savedWizard.actions[1].tags[0].output,
+      [firstTag.name],
+      "the already mapped tag is not duplicated"
+    );
+  });
+
+  test("adds an input to a mapper with no saved value", async function (assert) {
+    await visit("/admin/wizards/wizard/mapped_wizard");
+    await selectAction("action_3");
+
+    assert
+      .dom(`${USERNAMES_SETTING} .mapper-input`)
+      .doesNotExist("no input renders for an unset mapper");
+
+    await click(`${USERNAMES_SETTING} .add-mapper-input button`);
+
+    assert
+      .dom(`${USERNAMES_SETTING} .mapper-input`)
+      .exists({ count: 1 }, "the added input renders");
+  });
+
+  test("restores the add button when the last input is removed", async function (assert) {
+    await visit("/admin/wizards/wizard/mapped_wizard");
+    await selectAction("action_2");
+
+    assert
+      .dom(`${USERNAMES_SETTING} .mapper-input`)
+      .exists({ count: 1 }, "the saved usernames input renders");
+
+    await click(`${USERNAMES_SETTING} .mapper-input .remove-input`);
+
+    assert
+      .dom(`${USERNAMES_SETTING} .mapper-input`)
+      .doesNotExist("the removed input no longer renders");
+
+    assert
+      .dom(`${USERNAMES_SETTING} .add-mapper-input button`)
+      .exists("the add button is available again");
+
+    await click(`${USERNAMES_SETTING} .add-mapper-input button`);
+
+    assert
+      .dom(`${USERNAMES_SETTING} .mapper-input`)
+      .exists({ count: 1 }, "the added input renders");
   });
 });

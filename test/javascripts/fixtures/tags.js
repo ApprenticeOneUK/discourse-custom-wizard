@@ -1,7 +1,7 @@
 export default {
   tags: [
     {
-      id: "tag1",
+      id: 11,
       text: "tag1",
       name: "tag1",
       description: null,
@@ -10,7 +10,7 @@ export default {
       target_tag: null,
     },
     {
-      id: "tag2",
+      id: 12,
       text: "tag2",
       name: "tag2",
       description: null,

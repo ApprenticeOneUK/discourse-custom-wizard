@@ -1,14 +1,14 @@
+import { uniqueItemsFromArray } from "discourse/lib/array-tools";
 import { makeArray } from "discourse/lib/helpers";
 import TagChooser from "discourse/select-kit/components/tag-chooser";
+import { tagNames } from "../lib/wizard";
 
 export default TagChooser.extend({
   _selectedTagPayload(selectedTags, blockedTags) {
     const selectedTagIds = [];
     const selectedTagNames = [];
 
-    selectedTags
-      .concat(blockedTags)
-      .uniq()
+    uniqueItemsFromArray(selectedTags.concat(blockedTags))
       .slice(0, 100)
       .forEach((tag) => {
         if (typeof tag === "string") {
@@ -49,9 +49,7 @@ export default TagChooser.extend({
       data.tag_groups = this.tagGroups.join(",");
     }
 
-    const contentTags = makeArray(this.whitelist)
-      .map((tag) => (typeof tag === "string" ? tag : tag?.name))
-      .filter(Boolean);
+    const contentTags = tagNames(this.whitelist);
     if (contentTags.length) {
       data.content = contentTags;
     }

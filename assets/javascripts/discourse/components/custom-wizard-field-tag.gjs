@@ -1,12 +1,20 @@
 /* eslint-disable ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
 import { hash } from "@ember/helper";
+import { action } from "@ember/object";
+import { tagNames } from "../lib/wizard";
 import CustomWizardTagChooser from "./custom-wizard-tag-chooser";
 
 export default class CustomWizardFieldTag extends Component {
+  @action
+  updateValue(items) {
+    this.set("field.value", tagNames(items));
+  }
+
   <template>
     <CustomWizardTagChooser
       @tags={{this.field.value}}
+      @onChange={{this.updateValue}}
       @class={{this.fieldClass}}
       @tabindex={{this.field.tabindex}}
       @tagGroups={{this.field.tag_groups}}

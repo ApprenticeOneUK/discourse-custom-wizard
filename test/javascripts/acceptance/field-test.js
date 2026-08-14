@@ -6,6 +6,7 @@ import {
   count,
   query,
 } from "discourse/tests/helpers/qunit-helpers";
+import selectKit from "discourse/tests/helpers/select-kit-helper";
 import tagsJson from "../fixtures/tags";
 import usersJson from "../fixtures/users";
 import { allFieldsWizard } from "../helpers/wizard";
@@ -282,6 +283,56 @@ acceptance("Field | Tag search request", function (needs) {
       capturedParams.content,
       ["red", "blue"],
       "sends the content allow-list tag names"
+    );
+  });
+});
+
+acceptance("Field | Tag submission", function (needs) {
+  const [, secondTag] = tagsJson.tags;
+  let submittedFields;
+
+  needs.hooks.beforeEach(() => {
+    submittedFields = null;
+  });
+
+  needs.pretender((server, helper) => {
+    const tagField = allFieldsWizard.steps[0].fields.find(
+      (field) => field.type === "tag"
+    );
+    const tagWizard = {
+      ...allFieldsWizard,
+      steps: [
+        { ...allFieldsWizard.steps[0], fields: [tagField] },
+        { id: "step_2", index: 1, title: "step 2", fields: [] },
+      ],
+    };
+
+    server.get("/w/wizard.json", () => helper.response(tagWizard));
+    server.get("/custom-wizard/tags/search", () =>
+      helper.response({ results: tagsJson.tags })
+    );
+    server.put("/w/wizard/steps/step_1", (request) => {
+      submittedFields = JSON.parse(request.requestBody).fields;
+      return helper.response({
+        final: false,
+        next_step_id: "step_2",
+        wizard: tagWizard,
+      });
+    });
+  });
+
+  test("submits the selected tag names", async function (assert) {
+    await visit("/w/wizard");
+
+    const tagChooser = selectKit(".wizard-field.tag-field .tag-chooser");
+    await tagChooser.expand();
+    await tagChooser.selectRowByValue(secondTag.id);
+    await click(".wizard-step-footer .wizard-btn.next");
+
+    assert.deepEqual(
+      submittedFields.step_3_field_2,
+      [secondTag.name],
+      "the tag field value is submitted as tag names"
     );
   });
 });
