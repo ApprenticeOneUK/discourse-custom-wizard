@@ -66,3 +66,6 @@ en:
     wizard_recognised_image_upload_formats: "File types which will result in upload displaying an image preview"
     wizard_apis_enabled: "Enable API features (experimental)."
     wizard_critical_notices_on_dashboard: "Show critical notices about the custom wizard plugin on the admin dashboard."
+    wizard_required_field_error_message: "Message shown beneath an unanswered required field when no more specific message applies."
+    wizard_required_dropdown_error_message: "Message shown beneath an unanswered required dropdown."
+    wizard_required_checkbox_error_message: "Message shown beneath an unticked required checkbox."

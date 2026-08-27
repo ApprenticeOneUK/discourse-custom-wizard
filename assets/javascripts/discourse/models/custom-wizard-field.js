@@ -26,6 +26,7 @@ export default class CustomWizardField extends EmberObject.extend(ValidState) {
   type = null;
   value = null;
   required = null;
+  requiredErrorActive = false;
 
   @computed("wizardId", "stepId", "id")
   get i18nKey() {
@@ -47,32 +48,45 @@ export default class CustomWizardField extends EmberObject.extend(ValidState) {
     return translationOrText(`${this.i18nKey}.description`, this.description);
   }
 
-  check() {
-    if (this.customCheck) {
-      return this.customCheck();
-    }
-
-    let valid = this.valid;
-
-    if (!this.required) {
-      this.setValid(true);
-      return true;
-    }
-
+  hasRequiredValue() {
     const val = this.get("value");
     const type = this.get("type");
 
     if (type === "checkbox") {
-      valid = val;
+      return Boolean(val);
     } else if (type === "upload") {
-      valid = val && val.id > 0;
-    } else if (StandardFieldValidation.indexOf(type) > -1) {
-      valid = val && val.toString().length > 0;
+      return Boolean(val && val.id > 0);
+    } else if (StandardFieldValidation.includes(type)) {
+      return Boolean(val && val.toString().length > 0);
     } else if (type === "url") {
-      valid = true;
+      return true;
     }
 
-    this.setValid(Boolean(valid));
+    return this.valid;
+  }
+
+  requiredErrorDescription(messages) {
+    return messages[this.type] || messages.default;
+  }
+
+  check(requiredErrorMessages = {}) {
+    if (this.customCheck) {
+      return this.customCheck();
+    }
+
+    if (!this.required) {
+      this.set("requiredErrorActive", false);
+      this.setValid(true);
+      return true;
+    }
+
+    const valid = this.hasRequiredValue();
+    this.set("requiredErrorActive", !valid);
+    const description = valid
+      ? null
+      : this.requiredErrorDescription(requiredErrorMessages);
+
+    this.setValid(valid, description);
 
     return valid;
   }

@@ -4,6 +4,7 @@ import { on } from "@ember/modifier";
 import { action, computed } from "@ember/object";
 import didUpdate from "@ember/render-modifiers/modifiers/did-update";
 import { schedule } from "@ember/runloop";
+import { service } from "@ember/service";
 import { trustHTML } from "@ember/template";
 import { classNameBindings } from "@ember-decorators/component";
 import getUrl from "discourse/lib/get-url";
@@ -31,6 +32,8 @@ const uploadEndedEventKeys = [
 
 @classNameBindings(":wizard-step", "step.id")
 export default class CustomWizardStep extends Component {
+  @service siteSettings;
+
   saving = null;
 
   init() {
@@ -156,6 +159,20 @@ export default class CustomWizardStep extends Component {
     return this.step.fields.some((field) => field.show_in_sidebar);
   }
 
+  get requiredErrorMessages() {
+    return {
+      default:
+        this.siteSettings.wizard_required_field_error_message ||
+        i18n("wizard.required_field_error"),
+      dropdown:
+        this.siteSettings.wizard_required_dropdown_error_message ||
+        i18n("wizard.required_dropdown_error"),
+      checkbox:
+        this.siteSettings.wizard_required_checkbox_error_message ||
+        i18n("wizard.required_checkbox_error"),
+    };
+  }
+
   autoFocus() {
     discourseLater(() => {
       schedule("afterRender", () => {
@@ -224,7 +241,7 @@ export default class CustomWizardStep extends Component {
   @action
   exitEarly() {
     const step = this.step;
-    step.validate();
+    step.validate(this.requiredErrorMessages);
 
     if (step.get("valid")) {
       this.set("saving", true);
@@ -255,7 +272,7 @@ export default class CustomWizardStep extends Component {
       return;
     }
 
-    this.step.validate();
+    this.step.validate(this.requiredErrorMessages);
 
     if (this.step.get("valid")) {
       this.advance();

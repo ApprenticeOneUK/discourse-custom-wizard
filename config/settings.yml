@@ -18,6 +18,21 @@ plugins:
   wizard_important_notices_on_dashboard:
     client: true
     default: true
+  wizard_required_field_error_message:
+    client: true
+    type: string
+    default: "Complete this field to continue."
+    max: 200
+  wizard_required_dropdown_error_message:
+    client: true
+    type: string
+    default: "Select an option to continue."
+    max: 200
+  wizard_required_checkbox_error_message:
+    client: true
+    type: string
+    default: "Tick this box to continue."
+    max: 200
   wizard_subscription_product_key:
     hidden: true
     default: ''

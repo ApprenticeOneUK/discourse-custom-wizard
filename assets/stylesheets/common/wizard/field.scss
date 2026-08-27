@@ -35,11 +35,18 @@ body.custom-wizard {
     &.invalid .wizard-focusable {
       outline: 4px solid var(--danger);
     }
+
+    .field-error-description {
+      margin-top: 0.5em;
+      color: var(--danger);
+      font-weight: 600;
+    }
   }
 
   .checkbox-field {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
 
     .input-area {
       order: 0;
@@ -65,6 +72,11 @@ body.custom-wizard {
 
     & > .field-label + .field-description {
       margin-left: 0.5em;
+    }
+
+    & > .field-error-description {
+      order: 3;
+      flex-basis: 100%;
     }
   }
 

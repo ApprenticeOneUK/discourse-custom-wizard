@@ -35,11 +35,14 @@ export default class CustomWizardStep extends EmberObject.extend(ValidState) {
     return lookup;
   }
 
-  validate() {
+  validate(requiredErrorMessages) {
     let allValid = true;
 
     this.fields.forEach((field) => {
-      allValid = allValid && field.check();
+      const fieldValid = field.check(requiredErrorMessages);
+      if (!fieldValid) {
+        allValid = false;
+      }
     });
 
     this.setValid(allValid);

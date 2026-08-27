@@ -1,6 +1,7 @@
 import { getOwner } from "@ember/owner";
 import { click, fillIn, triggerKeyEvent, visit } from "@ember/test-helpers";
 import { test } from "qunit";
+import { cloneJSON } from "discourse/lib/object";
 import {
   acceptance,
   count,
@@ -237,6 +238,82 @@ acceptance("Field | Fields", function (needs) {
       .dom(".wizard-field.user-selector-field .d-multi-select-trigger")
       .isVisible();
     // TODO: add assertion for ac results. autocomplete does not appear in time.
+  });
+});
+
+acceptance("Field | Required validation", function (needs) {
+  const requiredFieldsWizard = cloneJSON(allFieldsWizard);
+  const sourceFields = requiredFieldsWizard.steps[0].fields;
+  const dropdown = sourceFields.find((field) => field.type === "dropdown");
+  const checkbox = sourceFields.find((field) => field.type === "checkbox");
+  const textarea = sourceFields.find((field) => field.type === "textarea");
+
+  requiredFieldsWizard.steps[0].fields = [
+    {
+      ...dropdown,
+      id: "required_dropdown_1",
+      required: true,
+      value: null,
+    },
+    {
+      ...dropdown,
+      id: "required_dropdown_2",
+      required: true,
+      value: null,
+    },
+    {
+      ...checkbox,
+      id: "required_checkbox",
+      required: true,
+      value: false,
+    },
+    {
+      ...textarea,
+      id: "required_text",
+      required: true,
+      value: "",
+    },
+  ];
+
+  needs.settings({
+    wizard_required_field_error_message: "Complete this custom field.",
+    wizard_required_dropdown_error_message: "Select a custom option.",
+    wizard_required_checkbox_error_message: "Tick this custom box.",
+  });
+
+  needs.pretender((server, helper) => {
+    server.get("/w/wizard.json", () => helper.response(requiredFieldsWizard));
+  });
+
+  test("shows configurable messages for every unanswered required field", async function (assert) {
+    await visit("/w/wizard");
+    await click(".wizard-btn.next");
+
+    assert.strictEqual(
+      count(".field-error-description[role='alert']"),
+      4,
+      "every required field displays an accessible error"
+    );
+    assert
+      .dom(".required_dropdown_1 .field-error-description")
+      .hasText("Select a custom option.");
+    assert
+      .dom(".required_dropdown_2 .field-error-description")
+      .hasText("Select a custom option.");
+    assert
+      .dom(".required_checkbox .field-error-description")
+      .hasText("Tick this custom box.");
+    assert
+      .dom(".required_text .field-error-description")
+      .hasText("Complete this custom field.");
+
+    const dropdownSelect = selectKit(".field-required-dropdown-1");
+    await dropdownSelect.expand();
+    await dropdownSelect.selectRowByValue("one");
+
+    assert
+      .dom(".required_dropdown_1 .field-error-description")
+      .doesNotExist("the error clears as soon as the field is completed");
   });
 });
 

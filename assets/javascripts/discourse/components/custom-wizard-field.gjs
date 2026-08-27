@@ -1,7 +1,8 @@
 /* eslint-disable ember/no-classic-components, ember/require-tagless-components */
 import Component from "@ember/component";
-import { computed } from "@ember/object";
+import { action, computed } from "@ember/object";
 import { getOwner } from "@ember/owner";
+import didUpdate from "@ember/render-modifiers/modifiers/did-update";
 import { dasherize } from "@ember/string";
 import { trustHTML } from "@ember/template";
 import { classNameBindings } from "@ember-decorators/component";
@@ -58,6 +59,14 @@ export default class CustomWizardField extends Component {
     return ["text", "textarea"].includes(this.field.type);
   }
 
+  @action
+  fieldValueChanged() {
+    if (this.field.requiredErrorActive && this.field.hasRequiredValue()) {
+      this.field.set("requiredErrorActive", false);
+      this.field.setValid(true);
+    }
+  }
+
   <template>
     <label for={{this.field.id}} class="field-label">
       {{trustHTML this.field.translatedLabel}}
@@ -73,7 +82,10 @@ export default class CustomWizardField extends Component {
 
     <FieldValidators @field={{this.field}} as |validators|>
       {{#if this.inputComponent}}
-        <div class="input-area">
+        <div
+          class="input-area"
+          {{didUpdate this.fieldValueChanged this.field.value}}
+        >
           <this.inputComponent
             @field={{this.field}}
             @step={{this.step}}
@@ -92,7 +104,7 @@ export default class CustomWizardField extends Component {
     {{/if}}
 
     {{#if this.field.errorDescription}}
-      <div class="field-error-description">
+      <div class="field-error-description" role="alert" aria-atomic="true">
         {{trustHTML this.field.errorDescription}}
       </div>
     {{/if}}
