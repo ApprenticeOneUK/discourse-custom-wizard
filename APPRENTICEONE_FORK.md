@@ -32,11 +32,3 @@ refresh an already-open wizard.
 These behaviours are intentionally not site settings because disabling them
 would recreate the accessibility and usability problem this fork fixes. Visual
 styling can still be overridden by the site theme.
-
-## Admin editor compatibility
-
-The wizard admin shell remains in the same frontend bundle as its child routes
-and templates. Its small navigation wrapper is inlined instead of importing an
-admin-only wrapper component. This prevents the application shell from being
-appended repeatedly when the wizard editor renders or updates on current
-Discourse builds.
