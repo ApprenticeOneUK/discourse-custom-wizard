@@ -32,3 +32,10 @@ refresh an already-open wizard.
 These behaviours are intentionally not site settings because disabling them
 would recreate the accessibility and usability problem this fork fixes. Visual
 styling can still be overridden by the site theme.
+
+## Admin mapper compatibility
+
+The mapper connector treats an omitted connector list as an empty list. Fixed
+connectors between mapper inputs intentionally do not receive a list; guarding
+that case preserves the safe behaviour of the pre-GJS computed property and
+prevents the wizard admin editor from repeatedly failing during rendering.
