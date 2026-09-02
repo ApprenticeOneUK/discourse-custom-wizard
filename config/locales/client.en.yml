@@ -24,6 +24,7 @@ en:
       required_field_error: "Complete this field to continue."
       required_dropdown_error: "Select an option to continue."
       required_checkbox_error: "Tick this box to continue."
+      dropdown_filter_label: "Filter %{label} options"
       upload: "Upload"
       uploading: "Uploading..."
       upload_error: "Sorry, there was an error uploading that file. Please try again."

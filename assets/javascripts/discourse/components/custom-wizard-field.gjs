@@ -31,6 +31,16 @@ export default class CustomWizardField extends Component {
     return `field-${dasherize(this.field.id)} wizard-focusable`;
   }
 
+  @computed("field.{wizardId,stepId,id}")
+  get fieldLabelId() {
+    const fieldPath = [this.field.wizardId, this.field.stepId, this.field.id]
+      .filter(Boolean)
+      .map((part) => dasherize(part))
+      .join("-");
+
+    return `wizard-field-${fieldPath}-label`;
+  }
+
   @computed("field.type", "field.id")
   get inputComponentName() {
     if (this.field.type === "text_only") {
@@ -68,7 +78,7 @@ export default class CustomWizardField extends Component {
   }
 
   <template>
-    <label for={{this.field.id}} class="field-label">
+    <label id={{this.fieldLabelId}} for={{this.field.id}} class="field-label">
       {{trustHTML this.field.translatedLabel}}
     </label>
 
@@ -90,6 +100,7 @@ export default class CustomWizardField extends Component {
             @field={{this.field}}
             @step={{this.step}}
             @fieldClass={{this.fieldClass}}
+            @fieldLabelId={{this.fieldLabelId}}
             @wizard={{this.wizard}}
             @autocomplete={{validators.autocomplete}}
           />

@@ -252,12 +252,21 @@ acceptance("Field | Required validation", function (needs) {
     {
       ...dropdown,
       id: "required_dropdown_1",
+      label: "<p>Which best describes you?</p>",
       required: true,
       value: null,
+      content: [
+        ...dropdown.content,
+        ...Array.from({ length: 10 }, (_, index) => ({
+          id: `extra_${index}`,
+          name: `Extra option ${index}`,
+        })),
+      ],
     },
     {
       ...dropdown,
       id: "required_dropdown_2",
+      label: "What stage are you at?",
       required: true,
       value: null,
     },
@@ -314,6 +323,63 @@ acceptance("Field | Required validation", function (needs) {
     assert
       .dom(".required_dropdown_1 .field-error-description")
       .doesNotExist("the error clears as soon as the field is completed");
+  });
+
+  test("uses each visible label as the dropdown accessible name", async function (assert) {
+    await visit("/w/wizard");
+
+    const firstHeader = query(".required_dropdown_1 .single-select-header");
+    const secondHeader = query(".required_dropdown_2 .single-select-header");
+
+    const accessibleName = (element) =>
+      element
+        .getAttribute("aria-labelledby")
+        .split(/\s+/)
+        .map((id) => document.getElementById(id).textContent.trim())
+        .join(" ");
+
+    assert.strictEqual(
+      accessibleName(firstHeader),
+      "Which best describes you?",
+      "the first dropdown uses its visible label"
+    );
+    assert.strictEqual(
+      accessibleName(secondHeader),
+      "What stage are you at?",
+      "the second dropdown uses its different visible label"
+    );
+    assert.notStrictEqual(
+      firstHeader.getAttribute("aria-labelledby"),
+      secondHeader.getAttribute("aria-labelledby"),
+      "the dropdowns reference unique labels"
+    );
+    assert.false(
+      firstHeader.hasAttribute("aria-label"),
+      "the generated SelectKit aria-label does not override the label"
+    );
+
+    const dropdownSelect = selectKit(".field-required-dropdown-1");
+    await dropdownSelect.expand();
+
+    assert
+      .dom(".required_dropdown_1 .filter-input")
+      .hasAttribute(
+        "aria-label",
+        "Filter Which best describes you? options",
+        "the separate search input describes its filtering purpose"
+      );
+
+    await dropdownSelect.selectRowByValue("one");
+
+    assert.strictEqual(
+      accessibleName(firstHeader),
+      "Which best describes you?",
+      "selecting a value does not replace the accessible name"
+    );
+    assert.false(
+      firstHeader.hasAttribute("aria-label"),
+      "the selected value does not become an aria-label"
+    );
   });
 });
 

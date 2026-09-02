@@ -39,3 +39,10 @@ The mapper connector treats an omitted connector list as an empty list. Fixed
 connectors between mapper inputs intentionally do not receive a list; guarding
 that case preserves the safe behaviour of the pre-GJS computed property and
 prevents the wizard admin editor from repeatedly failing during rendering.
+
+## Dropdown accessible names
+
+Each wizard dropdown header is labelled by its visible field label, so its
+accessible name remains field-specific before and after selection. Searchable
+dropdowns also give their filter input the field-specific name “Filter [field
+label] options”.
