@@ -4,10 +4,18 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - "**.md"
   pull_request:
-  schedule:
-    - cron: "0 0 * * *"
+    paths-ignore:
+      - "**.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  ci:
+  production_core:
     uses: discourse/.github/.github/workflows/discourse-plugin.yml@v1
+    with:
+      core_ref: a6ade3e9915f427d115f082a2ddbc6c208c5f3c1
