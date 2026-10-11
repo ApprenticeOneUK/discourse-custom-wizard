@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 # name: discourse-custom-wizard
 # about: Forms for Discourse. Better onboarding, structured posting, data enrichment, automated actions and much more.
-# version: 2.18.3-apprenticeone.4
+# version: 2.18.3-apprenticeone.5
 # authors: Angus McLeod, Faizaan Gagan, Robert Barrow, Keegan George, Kaitlin Maddever, Marcos Gutierrez
 # url: https://github.com/paviliondev/discourse-custom-wizard
 # contact_emails: development@pavilion.tech
@@ -47,6 +47,7 @@ after_initialize do
   require_relative "app/controllers/custom_wizard/tags.rb"
   require_relative "app/jobs/regular/refresh_api_access_token.rb"
   require_relative "app/jobs/regular/set_after_time_wizard.rb"
+  require_relative "app/jobs/scheduled/clear_custom_wizard_event_returns.rb"
   require_relative "lib/custom_wizard/validators/template.rb"
   require_relative "lib/custom_wizard/validators/update.rb"
   require_relative "lib/custom_wizard/action_result.rb"
@@ -67,6 +68,7 @@ after_initialize do
   require_relative "lib/custom_wizard/subscription.rb"
   require_relative "lib/custom_wizard/template.rb"
   require_relative "lib/custom_wizard/wizard.rb"
+  require_relative "lib/custom_wizard/event_return.rb"
   require_relative "lib/custom_wizard/user_history.rb"
   require_relative "lib/custom_wizard/api/api.rb"
   require_relative "lib/custom_wizard/api/authorization.rb"
@@ -157,6 +159,8 @@ after_initialize do
         end
 
         wizard = CustomWizard::Wizard.create(wizard_id, current_user)
+        CustomWizard::EventReturn.capture(current_user, wizard, cookies[:destination_url])
+        CustomWizard::EventReturn.capture(current_user, wizard, request.original_fullpath)
         redirect_to "/w/#{wizard_id.dasherize}" if wizard.should_redirect?
       end
     end

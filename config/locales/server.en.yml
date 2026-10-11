@@ -61,6 +61,7 @@ en:
       wizard_replacing_composer: "Category not allowed for topic creation."
 
   site_settings:
+    wizard_event_return_enabled: "Return Event Sign-in users to their event after required signup onboarding (expires after 24 hours). Explicit wizard action redirects still take precedence."
     custom_wizard_enabled: "Enable custom wizards."
     wizard_redirect_exclude_paths: "Routes excluded from wizard redirects."
     wizard_recognised_image_upload_formats: "File types which will result in upload displaying an image preview"

@@ -1,4 +1,6 @@
 plugins:
+  wizard_event_return_enabled:
+    default: false
   custom_wizard_enabled:
     default: true
     client: true
