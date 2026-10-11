@@ -32,6 +32,7 @@ class CustomWizard::StepsController < ::CustomWizard::WizardClientController
       end
 
       if current_step.final?
+        completion_actions_succeeded = true
         builder.template.actions.each do |action_template|
           if action_template["run_after"] === "wizard_completion"
             action_result =
@@ -42,16 +43,24 @@ class CustomWizard::StepsController < ::CustomWizard::WizardClientController
               ).perform
 
             current_submission = action_result.submission if action_result.success?
+            completion_actions_succeeded &&= action_result.success?
           end
         end
 
         current_submission.save
 
-        if redirect = get_redirect
-          updater.result[:redirect_on_complete] = redirect
-        end
-
+        redirect = get_redirect
+        explicit_redirect = explicit_redirect?
         @wizard.cleanup_on_complete!
+
+        event_return = CustomWizard::EventReturn.consume(@wizard)
+        # Explicit action routes retain precedence; the event replaces only the
+        # usual entry/referrer destination after successful completion actions.
+        if !event_return.nil? && !explicit_redirect
+          # Do not fall back to a stale event URL saved as the entry referrer.
+          redirect = completion_actions_succeeded && event_return ? event_return : "/"
+        end
+        updater.result[:redirect_on_complete] = redirect if redirect
 
         result[:final] = true
       else
@@ -106,5 +115,10 @@ class CustomWizard::StepsController < ::CustomWizard::WizardClientController
     return nil if submission.blank?
     ## route_to set by actions, redirect_on_complete set by actions, redirect_to set at wizard entry
     submission.route_to || submission.redirect_on_complete || submission.redirect_to
+  end
+
+  def explicit_redirect?
+    @result[:redirect_on_next].present? || @wizard.current_submission.route_to.present? ||
+      @wizard.current_submission.redirect_on_complete.present?
   end
 end
